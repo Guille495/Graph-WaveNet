@@ -62,7 +62,7 @@ def generate_train_val_test(args):
         df,
         x_offsets=x_offsets,
         y_offsets=y_offsets,
-        add_time_in_day=True,
+        add_time_in_day=args.tod,
         add_day_in_week=args.dow,
     )
 
@@ -99,6 +99,7 @@ if __name__ == "__main__":
     parser.add_argument("--seq_length_y", type=int, default=12, help="Sequence Length.",)
     parser.add_argument("--y_start", type=int, default=1, help="Y pred start", )
     parser.add_argument("--dow", action='store_true',)
+    parser.add_argument("--tod", action='store_true',)    
 
     args = parser.parse_args()
     if os.path.exists(args.output_dir):
