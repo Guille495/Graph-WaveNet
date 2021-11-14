@@ -25,6 +25,7 @@ parser.add_argument('--dropout',type=float,default=0.3,help='dropout rate')
 parser.add_argument('--weight_decay',type=float,default=0.0001,help='weight decay rate')
 parser.add_argument('--checkpoint',type=str,help='')
 parser.add_argument('--plotheatmap',type=str,default='True',help='')
+parser.add_argument('--yrealy',type=int,default=99,help='')
 
 
 args = parser.parse_args()
@@ -73,7 +74,7 @@ def main():
     amae = []
     amape = []
     armse = []
-    for i in range(12):
+    for i in range(args.seq_length):
         pred = scaler.inverse_transform(yhat[:,:,i])
         real = realy[:,:,i]
         metrics = util.metric(pred,real)
@@ -83,8 +84,8 @@ def main():
         amape.append(metrics[1])
         armse.append(metrics[2])
 
-    log = 'On average over 12 horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-    print(log.format(np.mean(amae),np.mean(amape),np.mean(armse)))
+    log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
+    print(log.format(seq_length,np.mean(amae),np.mean(amape),np.mean(armse)))
 
 
     if args.plotheatmap == "True":
@@ -97,10 +98,10 @@ def main():
         sns.heatmap(df, cmap="RdYlBu")
         plt.savefig("./emb"+ '.pdf')
 
-    y12 = realy[:,99,11].cpu().detach().numpy()
-    yhat12 = scaler.inverse_transform(yhat[:,99,11]).cpu().detach().numpy()
+    y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
+    yhat12 = scaler.inverse_transform(yhat[:,args.yrealy,11]).cpu().detach().numpy()
 
-    y3 = realy[:,99,2].cpu().detach().numpy()
+    y3 = realy[:,args.yrealy,2].cpu().detach().numpy()
     yhat3 = scaler.inverse_transform(yhat[:,99,2]).cpu().detach().numpy()
 
     df2 = pd.DataFrame({'real12':y12,'pred12':yhat12, 'real3': y3, 'pred3':yhat3})
