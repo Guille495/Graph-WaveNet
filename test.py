@@ -101,10 +101,10 @@ def main():
     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
     yhat12 = scaler.inverse_transform(yhat[:,args.yrealy,11]).cpu().detach().numpy()
 
-    y3 = realy[:,args.yrealy,2].cpu().detach().numpy()
-    yhat3 = scaler.inverse_transform(yhat[:,args.yrealy,2]).cpu().detach().numpy()
+    y1 = realy[:,args.yrealy,0].cpu().detach().numpy()
+    yhat1 = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
 
-    df2 = pd.DataFrame({'real12':y12,'pred12':yhat12, 'real3': y3, 'pred3':yhat3})
+    df2 = pd.DataFrame({'real0': y1, 'pred0':yhat1 , 'real12':y12,'pred12':yhat12})
     df2.to_csv('./wave.csv',index=False)
 
 
