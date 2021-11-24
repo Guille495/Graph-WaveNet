@@ -176,4 +176,4 @@ if __name__ == "__main__":
     t2 = time.time()
     
     print("Total time spent: {:.4f}".format(t2-t1))
-    print("Checkpoint save file: {:.4f}".format(path_name))
+    print("Checkpoint save file: {}".format(path_name))
