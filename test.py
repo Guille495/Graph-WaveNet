@@ -104,7 +104,7 @@ def main():
     y1 = realy[:,args.yrealy,0].cpu().detach().numpy()
     yhat1 = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
 
-    df2 = pd.DataFrame({'real0': y1, 'pred0':yhat1 , 'real12':y12,'pred12':yhat12})
+    df2 = pd.DataFrame({'real1': y1, 'pred1':yhat1 , 'real12':y12,'pred12':yhat12})
     df2.to_csv('./wave.csv',index=False)
 
 
