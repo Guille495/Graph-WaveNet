@@ -164,13 +164,16 @@ def main():
 
     log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
     print(log.format(args.seq_length,np.mean(amae),np.mean(amape),np.mean(armse)))
-    path_name = print(args.save+"_exp"+str(args.expid)+"_best_"+str(round(his_loss[bestid],2))+".pth")
-    torch.save(engine.model.state_dict(), args.save+"_exp"+str(args.expid)+"_best_"+str(round(his_loss[bestid],2))+".pth")
+    path_name = args.save+"_exp"+str(args.expid)+"_best_"+str(round(his_loss[bestid],2))+".pth"
+    torch_save = torch.save(engine.model.state_dict(), args.save+"_exp"+str(args.expid)+"_best_"+str(round(his_loss[bestid],2))+".pth")
+    
+    return torch_save,path_name
 
 
 if __name__ == "__main__":
     t1 = time.time()
     main()
+    _ ,path_name = main()
     t2 = time.time()
     
     print("Total time spent: {:.4f}".format(t2-t1))
