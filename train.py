@@ -172,8 +172,7 @@ def main():
 
 if __name__ == "__main__":
     t1 = time.time()
-    main()
-    _ ,path_name = main()
+    torch_save,path_name = main()
     t2 = time.time()
     
     print("Total time spent: {:.4f}".format(t2-t1))
