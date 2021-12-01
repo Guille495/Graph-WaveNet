@@ -87,7 +87,7 @@ def main():
     log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
     print(log.format(args.seq_length,np.mean(amae),np.mean(amape),np.mean(armse)))
     
-    if args.addaptadj == "True":
+    if args.addaptadj == True:
         addaptadj_text = "Adapt"
     else:
         addaptadj_text = "NoAdapt"
