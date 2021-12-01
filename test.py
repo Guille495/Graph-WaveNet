@@ -86,7 +86,14 @@ def main():
 
     log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
     print(log.format(args.seq_length,np.mean(amae),np.mean(amape),np.mean(armse)))
-
+    
+    if args.addaptadj == "True":
+        addaptadj_text = "Adapt"
+    else:
+        addaptadj_text = "NoAdapt"
+    
+    variant = args.adjdata
+    variant = str(str(variant.split("/")[2]).split(".")[0])
 
     if args.plotheatmap == "True":
         adp = F.softmax(F.relu(torch.mm(model.nodevec1, model.nodevec2)), dim=1)
@@ -96,7 +103,7 @@ def main():
         adp = adp*(1/np.max(adp))
         df = pd.DataFrame(adp)
         sns.heatmap(df, cmap="RdYlBu")
-        plt.savefig("./emb"+ '.pdf')
+        plt.savefig("./emb" + variant + addaptadj_text + '.pdf')
 
     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
     yhat12 = scaler.inverse_transform(yhat[:,args.yrealy,11]).cpu().detach().numpy()
@@ -105,7 +112,7 @@ def main():
     yhat1 = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
 
     df2 = pd.DataFrame({'real1': y1, 'pred1':yhat1 , 'real12':y12,'pred12':yhat12})
-    df2.to_csv('./wave.csv',index=False)
+    df2.to_csv('./wave' + variant + addaptadj_text + '.csv',index=False)
 
 
 if __name__ == "__main__":
