@@ -25,7 +25,7 @@ parser.add_argument('--dropout',type=float,default=0.3,help='dropout rate')
 parser.add_argument('--weight_decay',type=float,default=0.0001,help='weight decay rate')
 parser.add_argument('--checkpoint',type=str,help='')
 parser.add_argument('--plotheatmap',type=str,default='True',help='')
-parser.add_argument('--yrealy',type=int,default=99,help='sensor_id which will be used to produce the real vs. preds output')
+parser.add_argument('--yrealy',type=int,default=82,help='sensor_id which will be used to produce the real vs. preds output')
 
 
 args = parser.parse_args()
