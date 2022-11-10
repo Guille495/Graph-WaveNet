@@ -152,7 +152,7 @@ def main():
     amae = []
     amape = []
     armse = []
-    for i in [0 , args.seq_length -1]:
+    for i in range(args.seq_length):
         pred = scaler.inverse_transform(yhat[:,:,i])
         real = realy[:,:,i]
         metrics = util.metric(pred,real)
