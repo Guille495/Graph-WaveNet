@@ -46,7 +46,7 @@ def main():
     if args.aptonly:
         supports = None
 
-    model =  gwnet(device, args.num_nodes, args.dropout, supports=supports, gcn_bool=args.gcn_bool, addaptadj=args.addaptadj, aptinit=adjinit)
+    model =  gwnet(device, args.num_nodes, args.dropout, supports=supports, gcn_bool=args.gcn_bool, addaptadj=args.addaptadj, aptinit=adjinit,out_dim=args.seq_length)
     model.to(device)
     model.load_state_dict(torch.load(args.checkpoint))
     model.eval()
