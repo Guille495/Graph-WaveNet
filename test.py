@@ -127,23 +127,10 @@ def main():
         sensor_id = np.append(sensor_id , sensor_yrealy)
     
 
-    print(f'y_real = {y_real.shape[0]} , y_hat = {y_hat.shape[0]} , y_seq_length = {y_seq_length.shape[0]} , temporal_horizon = {temporal_horizon.shape[0]} , sensor_yrealy = {sensor_yrealy.shape[0]} , sensor_id = {sensor_id.shape[0]}')
+    print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {sensor_yrealy.shape[0]} rows per sensor (timesteps * horizons) , {sensor_id.shape[0]} repeated sensors')    
     
-#     y_real = pd.DataFrame(y_real)
-#     y_real.to_csv('y_real.csv')
-
-#     y_hat = pd.DataFrame(y_hat)
-#     y_hat.to_csv('y_hat.csv')
-    
-#     temporal_horizon = pd.DataFrame(temporal_horizon)
-#     temporal_horizon.to_csv('temporal_horizon.csv')
-    
-#     sensor_id = pd.DataFrame(sensor_id)
-#     sensor_id.to_csv('sensor_id.csv')    
-    
-    
-#     df2 = pd.DataFrame({'sensor id': sensor_id,'temporal horizon': temporal_horizon, 'real_values': y_real, 'pred_values': y_hat})
-
+    df2 = pd.DataFrame({'sensor id': sensor_id,'temporal horizon': temporal_horizon, 'real_values': y_real, 'pred_values': y_hat})
+    df2.to_csv('./predictions' + '_' + variant + "_" + addaptadj_text + '.csv',index=False)
 
 ###     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
 ###     yhat12 = scaler.inverse_transform(yhat[:,args.yrealy,11]).cpu().detach().numpy()
@@ -153,7 +140,7 @@ def main():
 
 ###     df2 = pd.DataFrame({'real1': y1, 'pred1':yhat1 })
 
-#     df2.to_csv('./predictions' + '_' + variant + "_" + addaptadj_text + '.csv',index=False)
+
 
 
 if __name__ == "__main__":
