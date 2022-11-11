@@ -121,15 +121,16 @@ def main():
             y_seq_length = np.repeat( j+1 , args.ytest_size) #timesteps test dataset
             
             temporal_horizon = np.append(temporal_horizon , y_seq_length)
+            
         
-
+        timesteps = np.tile(range(args.ytest_size + 1),args.seq_length)
         sensor_yrealy = np.repeat( i+1 , args.ytest_size * args.seq_length)
         sensor_id = np.append(sensor_id , sensor_yrealy)
     
 
     print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {sensor_yrealy.shape[0]} rows per sensor (timesteps * horizons) , {sensor_id.shape[0]} repeated sensors')    
     
-    df2 = pd.DataFrame({'sensor id': sensor_id,'temporal horizon': temporal_horizon, 'real_values': y_real, 'pred_values': y_hat})
+    df2 = pd.DataFrame({'sensor id': sensor_id,'temporal horizon': temporal_horizon,'timesteps':timesteps, 'real_values': y_real, 'pred_values': y_hat})
     df2.to_csv('./predictions' + '_' + variant + "_" + addaptadj_text + '.csv',index=False)
 
 ###     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
