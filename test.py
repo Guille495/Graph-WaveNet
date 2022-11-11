@@ -115,14 +115,14 @@ def main():
         
         for j in [0]: #range(args.seq_length):
 
-            y_real = y_real.append(y_real , realy[:,args.yrealy, j ].cpu().detach().numpy() ) 
-            y_hat = y_hat.append(y_hat , scaler.inverse_transform(yhat[:,args.yrealy, j ]).cpu().detach().numpy() )
+            y_real = np.append(y_real , realy[:,args.yrealy, j ].cpu().detach().numpy() ) 
+            y_hat = np.append(y_hat , scaler.inverse_transform(yhat[:,args.yrealy, j ]).cpu().detach().numpy() )
             
-            sensor_id = sensor_id.append(sensor_id,np.repeat( i , len(y_real)))
-            temporal_horizon = temporal_horizon.append(temporal_horizon,np.repeat( j , len(y_real)))
+            sensor_id = np.append(sensor_id , np.repeat( i , len(y_real)))
+            temporal_horizon = np.append(temporal_horizon , np.repeat( j , len(y_real)))
             
     
-    df2.append({'sensor id': sensor_id,'temporal horizon': temporal_horizon, 'real_values': y_real, 'pred_values': y_hat} , ignore_index=True)
+    df2 = pd.DataFrame({'sensor id': sensor_id,'temporal horizon': temporal_horizon, 'real_values': y_real, 'pred_values': y_hat} , ignore_index=True)
 
 
 #     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
