@@ -126,7 +126,7 @@ def main():
         sensor_yrealy = np.repeat( i+1 , args.ytest_size * args.seq_length)
         sensor_id = np.append(sensor_id , sensor_yrealy)
         
-    timesteps = np.tile(np.tile(np.arange(args.ytest_size)+1,args.seq_length) ,args.args.yrealy)
+    timesteps = np.tile(np.tile(np.arange(args.ytest_size)+1,args.seq_length) ,args.yrealy)
     
 
     print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {sensor_yrealy.shape[0]} rows per sensor (timesteps * horizons) , {sensor_id.shape[0]} repeated sensors')    
