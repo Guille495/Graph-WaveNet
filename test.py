@@ -115,7 +115,7 @@ def main():
 
     for i in range(args.yrealy):
 
-        for j in range(args.seq_length):
+        for j in [0]: #range(args.seq_length):
             temporal_horizon = j                
 
             y_real = realy[:,args.yrealy, temporal_horizon ].cpu().detach().numpy()
