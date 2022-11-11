@@ -104,12 +104,26 @@ def main():
         df = pd.DataFrame(adp)
         sns.heatmap(df, cmap="RdYlBu")
         plt.savefig("./heatmap" + "_" + variant + "_" + addaptadj_text + '.pdf')
+        
+    
+    y_real = []
+    y_hat = []
+    sensor_id = []
+    
+    df2 = pd.DataFrame({'sensor id': [], 'real_values': [], 'pred1': []})
+            
 
-    y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
-    yhat12 = scaler.inverse_transform(yhat[:,args.yrealy,11]).cpu().detach().numpy()
+    for i in range(args.yrealy):
+        y_real = realy[:,args.yrealy,0].cpu().detach().numpy()
+        y_hat = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
+        df2.append(pd.DataFrame({'sensor id': i,  'real_values': y_real, 'pred1': y_hat}))
+        
 
-    y1 = realy[:,args.yrealy,0].cpu().detach().numpy()
-    yhat1 = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
+#     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
+#     yhat12 = scaler.inverse_transform(yhat[:,args.yrealy,11]).cpu().detach().numpy()
+
+#     y1 = realy[:,args.yrealy,0].cpu().detach().numpy()
+#     yhat1 = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
 
     df2 = pd.DataFrame({'real1': y1, 'pred1':yhat1 , 'real12':y12,'pred12':yhat12})
     df2.to_csv('./predictions' + '_' + variant + "_" + addaptadj_text + '.csv',index=False)
