@@ -106,31 +106,32 @@ def main():
         plt.savefig("./heatmap" + "_" + variant + "_" + addaptadj_text + '.pdf')
         
     
-#     y_real = []
-#     y_hat = []
-#     sensor_id = []
-    
-#     df2 = pd.DataFrame({'sensor id': [],'temporal horizon': [], 'real_values': [], 'pred_values': []})
-            
-
-#     for i in range(args.yrealy):
+    y_real = np.array([])
+    y_hat = np.array([])
+    sensor_id = np.array([])
+    temporal_horizon = np.array([])
+   
+    for i in range(args.yrealy):
         
-#         for j in [0]: #range(args.seq_length):
-#             temporal_horizon = j                
+        for j in [0]: #range(args.seq_length):
 
-#             y_real = realy[:,args.yrealy, temporal_horizon ].cpu().detach().numpy()
-#             y_hat = scaler.inverse_transform(yhat[:,args.yrealy, temporal_horizon ]).cpu().detach().numpy()
-
-#             df2.append({'sensor id': i,'temporal horizon': j, 'real_values': y_real, 'pred_values': y_hat} , ignore_index=True)
+            y_real = y_real.append(y_real , realy[:,args.yrealy, j ].cpu().detach().numpy() ) 
+            y_hat = y_hat.append(y_hat , scaler.inverse_transform(yhat[:,args.yrealy, j ]).cpu().detach().numpy() )
+            
+            sensor_id = sensor_id.append(sensor_id,np.repeat( i , len(y_real)))
+            temporal_horizon = temporal_horizon.append(temporal_horizon,np.repeat( j , len(y_real)))
+            
+    
+    df2.append({'sensor id': sensor_id,'temporal horizon': temporal_horizon, 'real_values': y_real, 'pred_values': y_hat} , ignore_index=True)
 
 
 #     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
 #     yhat12 = scaler.inverse_transform(yhat[:,args.yrealy,11]).cpu().detach().numpy()
 
-    y1 = realy[:,args.yrealy,0].cpu().detach().numpy()
-    yhat1 = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
+#     y1 = realy[:,args.yrealy,0].cpu().detach().numpy()
+#     yhat1 = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
 
-    df2 = pd.DataFrame({'real1': y1, 'pred1':yhat1 })
+#     df2 = pd.DataFrame({'real1': y1, 'pred1':yhat1 })
 
     df2.to_csv('./predictions' + '_' + variant + "_" + addaptadj_text + '.csv',index=False)
 
