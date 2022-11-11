@@ -122,7 +122,7 @@ def main():
             temporal_horizon = np.append(temporal_horizon , np.repeat( j , len(y_real)))
             
     
-    df2 = pd.DataFrame({'sensor id': sensor_id,'temporal horizon': temporal_horizon, 'real_values': y_real, 'pred_values': y_hat} , ignore_index=True)
+    df2 = pd.DataFrame({'sensor id': sensor_id,'temporal horizon': temporal_horizon, 'real_values': y_real, 'pred_values': y_hat})
 
 
 #     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
