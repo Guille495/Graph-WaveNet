@@ -113,11 +113,11 @@ def main():
     df2 = pd.DataFrame({'sensor id': [],'temporal horizon': [], 'real_values': [], 'pred_values': []})
             
 
-    for j in range(args.seq_length):
-        
-        temporal_horizon = j
+    for i in range(args.yrealy):
 
-        for i in range(args.yrealy):
+        for j in range(args.seq_length):
+            temporal_horizon = j                
+
             y_real = realy[:,args.yrealy, temporal_horizon ].cpu().detach().numpy()
             y_hat = scaler.inverse_transform(yhat[:,args.yrealy, temporal_horizon ]).cpu().detach().numpy()
 
