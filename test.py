@@ -110,14 +110,19 @@ def main():
     y_hat = []
     sensor_id = []
     
-    df2 = pd.DataFrame({'sensor id': [], 'real_values': [], 'pred1': []})
+    df2 = pd.DataFrame({'sensor id': [],'temporal horizon': [], 'real_values': [], 'pred_values': []})
             
 
-    for i in range(args.yrealy):
-        y_real = realy[:,args.yrealy,0].cpu().detach().numpy()
-        y_hat = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
-        df2.append(pd.DataFrame({'sensor id': i,  'real_values': y_real, 'pred1': y_hat}))
+    for j in range(args.seq_length):
         
+        temporal_horizon = j
+
+        for i in range(args.yrealy):
+            y_real = realy[:,args.yrealy, temporal_horizon ].cpu().detach().numpy()
+            y_hat = scaler.inverse_transform(yhat[:,args.yrealy, temporal_horizon ]).cpu().detach().numpy()
+
+            df2.append(pd.DataFrame({'sensor id': i,'temporal horizon': j, 'real_values': y_real, 'pred_values': y_hat}))
+
 
 #     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
 #     yhat12 = scaler.inverse_transform(yhat[:,args.yrealy,11]).cpu().detach().numpy()
@@ -125,7 +130,8 @@ def main():
 #     y1 = realy[:,args.yrealy,0].cpu().detach().numpy()
 #     yhat1 = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
 
-    df2 = pd.DataFrame({'real1': y1, 'pred1':yhat1 , 'real12':y12,'pred12':yhat12})
+#     df2 = pd.DataFrame({'real1': y1, 'pred1':yhat1 , 'real12':y12,'pred12':yhat12})
+
     df2.to_csv('./predictions' + '_' + variant + "_" + addaptadj_text + '.csv',index=False)
 
 
