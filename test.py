@@ -118,10 +118,10 @@ def main():
             y_real = np.append(y_real , realy[:,args.yrealy, j ].cpu().detach().numpy() ) 
             y_hat = np.append(y_hat , scaler.inverse_transform(yhat[:,args.yrealy, j ]).cpu().detach().numpy() )
             
-            sensor_id = np.append(sensor_id , np.repeat( i , len(y_real)))
             temporal_horizon = np.append(temporal_horizon , np.repeat( j , len(y_real)))
-            
-    
+ 
+        sensor_id = np.append(sensor_id , np.repeat( i , len(y_real)))            
+
     df2 = pd.DataFrame({'sensor id': sensor_id,'temporal horizon': temporal_horizon, 'real_values': y_real, 'pred_values': y_hat})
 
 
