@@ -121,7 +121,7 @@ def main():
             y_real = realy[:,args.yrealy, temporal_horizon ].cpu().detach().numpy()
             y_hat = scaler.inverse_transform(yhat[:,args.yrealy, temporal_horizon ]).cpu().detach().numpy()
 
-            df2.append(pd.DataFrame({'sensor id': i,'temporal horizon': j, 'real_values': y_real, 'pred_values': y_hat}))
+            df2.append({'sensor id': i,'temporal horizon': j, 'real_values': y_real, 'pred_values': y_hat} , ignore_index=True)
 
 
 #     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
