@@ -18,7 +18,7 @@ parser.add_argument('--randomadj',action='store_true',help='whether random initi
 parser.add_argument('--seq_length',type=int,default=12,help='')
 parser.add_argument('--nhid',type=int,default=32,help='')
 parser.add_argument('--in_dim',type=int,default=2,help='inputs dimension')
-parser.add_argument('--num_nodes',type=int,default=207,help='number of nodes')
+parser.add_argument('--num_nodes',type=int,default=136,help='number of nodes')
 parser.add_argument('--batch_size',type=int,default=64,help='batch size')
 parser.add_argument('--learning_rate',type=float,default=0.001,help='learning rate')
 parser.add_argument('--dropout',type=float,default=0.3,help='dropout rate')
@@ -26,6 +26,7 @@ parser.add_argument('--weight_decay',type=float,default=0.0001,help='weight deca
 parser.add_argument('--checkpoint',type=str,help='')
 parser.add_argument('--plotheatmap',type=str,default='True',help='')
 parser.add_argument('--yrealy',type=int,default=82,help='sensor_id which will be used to produce the real vs. preds output')
+parser.add_argument('--ytest_size',type=int,default=3063,help='timesteps based on TEST dataset')
 
 
 args = parser.parse_args()
@@ -113,30 +114,32 @@ def main():
    
     for i in range(args.yrealy):
         
-        for j in [0]: #range(args.seq_length):
+        for j in range(args.seq_length):
 
             y_real = np.append(y_real , realy[:, i , j ].cpu().detach().numpy() ) 
             y_hat = np.append(y_hat , scaler.inverse_transform(yhat[:, i , j ]).cpu().detach().numpy() )
+            y_seq_length = np.repeat( j+1 , args.ytest_size) #timesteps test dataset
             
-            y_seq_length = np.repeat( j , len(y_real))
             temporal_horizon = np.append(temporal_horizon , y_seq_length)
         
 
-        sensor_yrealy = np.repeat( i , len(y_real))
+        sensor_yrealy = np.repeat( i+1 , args.ytest_size * args.seq_length)
         sensor_id = np.append(sensor_id , sensor_yrealy)
     
-    
-    y_real = pd.DataFrame(y_real)
-    y_real.to_csv('y_real.csv')
 
-    y_hat = pd.DataFrame(y_hat)
-    y_hat.to_csv('y_hat.csv')
+    print(f'y_real = {y_real.shape[0]} , y_hat = {y_hat.shape[0]} , y_seq_length = {y_seq_length.shape[0]} , temporal_horizon = {temporal_horizon.shape[0]} , sensor_yrealy = {sensor_yrealy.shape[0]} , sensor_id = {sensor_id.shape[0]}')
     
-    temporal_horizon = pd.DataFrame(temporal_horizon)
-    temporal_horizon.to_csv('temporal_horizon.csv')
+#     y_real = pd.DataFrame(y_real)
+#     y_real.to_csv('y_real.csv')
+
+#     y_hat = pd.DataFrame(y_hat)
+#     y_hat.to_csv('y_hat.csv')
     
-    sensor_id = pd.DataFrame(sensor_id)
-    sensor_id.to_csv('sensor_id.csv')    
+#     temporal_horizon = pd.DataFrame(temporal_horizon)
+#     temporal_horizon.to_csv('temporal_horizon.csv')
+    
+#     sensor_id = pd.DataFrame(sensor_id)
+#     sensor_id.to_csv('sensor_id.csv')    
     
     
 #     df2 = pd.DataFrame({'sensor id': sensor_id,'temporal horizon': temporal_horizon, 'real_values': y_real, 'pred_values': y_hat})
