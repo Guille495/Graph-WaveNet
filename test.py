@@ -15,7 +15,7 @@ parser.add_argument('--gcn_bool',action='store_true',help='whether to add graph 
 parser.add_argument('--aptonly',action='store_true',help='whether only adaptive adj')
 parser.add_argument('--addaptadj',action='store_true',help='whether add adaptive adj')
 parser.add_argument('--randomadj',action='store_true',help='whether random initialize adaptive adj')
-parser.add_argument('--seq_length',type=int,default=12,help='')
+parser.add_argument('--seq_length',type=int,default=1,help='')
 parser.add_argument('--nhid',type=int,default=32,help='')
 parser.add_argument('--in_dim',type=int,default=1,help='inputs dimension')
 parser.add_argument('--num_nodes',type=int,default=137,help='number of nodes')
@@ -25,6 +25,8 @@ parser.add_argument('--dropout',type=float,default=0.3,help='dropout rate')
 parser.add_argument('--weight_decay',type=float,default=0.0001,help='weight decay rate')
 parser.add_argument('--checkpoint',type=str,help='')
 parser.add_argument('--plotheatmap',type=str,default='True',help='')
+parser.add_argument('--yrealy',type=int,default=82,help='sensor_id which will be used to produce the real vs. preds output')
+parser.add_argument('--ytest_size',type=int,default=3063,help='timesteps based on TEST dataset')
 
 
 args = parser.parse_args()
@@ -45,7 +47,7 @@ def main():
     if args.aptonly:
         supports = None
 
-    model =  gwnet(device, args.num_nodes, args.dropout, supports=supports, gcn_bool=args.gcn_bool, addaptadj=args.addaptadj, aptinit=adjinit)
+    model =  gwnet(device, args.num_nodes, args.dropout, supports=supports, gcn_bool=args.gcn_bool, addaptadj=args.addaptadj, aptinit=adjinit , out_dim=args.seq_length)
     model.to(device)
     model.load_state_dict(torch.load(args.checkpoint))
     model.eval()
@@ -73,7 +75,10 @@ def main():
     amae = []
     amape = []
     armse = []
-    for i in range(1):
+
+    
+    for i in range(args.seq_length):
+
         pred = scaler.inverse_transform(yhat[:,:,i])
         real = realy[:,:,i]
         metrics = util.metric(pred,real)
@@ -83,9 +88,16 @@ def main():
         amape.append(metrics[1])
         armse.append(metrics[2])
 
-    log = 'On average over 12 horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-    print(log.format(np.mean(amae),np.mean(amape),np.mean(armse)))
-
+    log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
+    print(log.format(args.seq_length,np.mean(amae),np.mean(amape),np.mean(armse)))
+    
+    if args.addaptadj == True:
+        addaptadj_text = "Adapt"
+    else:
+        addaptadj_text = "NoAdapt"
+    
+    variant = args.adjdata
+    variant = str(str(str(variant.split("/")[2]).split(".")[0]).split("_")[3])
 
     if args.plotheatmap == "True":
         adp = F.softmax(F.relu(torch.mm(model.nodevec1, model.nodevec2)), dim=1)
@@ -95,16 +107,45 @@ def main():
         adp = adp*(1/np.max(adp))
         df = pd.DataFrame(adp)
         sns.heatmap(df, cmap="RdYlBu")
-        plt.savefig("./emb"+ '.pdf')
+        plt.savefig("./heatmap" + "_" + variant + "_" + addaptadj_text + '.pdf')
+        
+    
+    y_real = np.array([])
+    y_hat = np.array([])
+    sensor_id = np.array([])
+    temporal_horizon = np.array([])
+   
+    for i in range(args.yrealy):
+        
+        for j in range(args.seq_length):
 
-    y12 = realy[:,99,11].cpu().detach().numpy()
-    yhat12 = scaler.inverse_transform(yhat[:,99,11]).cpu().detach().numpy()
+            y_real = np.append(y_real , realy[:, i , j ].cpu().detach().numpy() ) 
+            y_hat = np.append(y_hat , scaler.inverse_transform(yhat[:, i , j ]).cpu().detach().numpy() )
+            y_seq_length = np.repeat( j+1 , args.ytest_size) #timesteps test dataset
+            
+            temporal_horizon = np.append(temporal_horizon , y_seq_length)
+            
 
-    y3 = realy[:,99,2].cpu().detach().numpy()
-    yhat3 = scaler.inverse_transform(yhat[:,99,2]).cpu().detach().numpy()
+        sensor_yrealy = np.repeat( i+1 , args.ytest_size * args.seq_length)
+        sensor_id = np.append(sensor_id , sensor_yrealy)
+        
+    timesteps = np.tile(np.tile(np.arange(args.ytest_size)+1,args.seq_length) ,args.yrealy)
+    
 
-    df2 = pd.DataFrame({'real12':y12,'pred12':yhat12, 'real3': y3, 'pred3':yhat3})
-    df2.to_csv('./wave.csv',index=False)
+    print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {sensor_yrealy.shape[0]} rows per sensor (timesteps * horizons) , {sensor_id.shape[0]} repeated sensors')    
+    
+    df2 = pd.DataFrame({'sensor id': sensor_id,'temporal horizon': temporal_horizon,'timesteps':timesteps, 'real_values': y_real, 'pred_values': y_hat})
+    df2.to_csv('./predictions' + '_' + variant + "_" + addaptadj_text + '.csv',index=False)
+
+###     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
+###     yhat12 = scaler.inverse_transform(yhat[:,args.yrealy,11]).cpu().detach().numpy()
+
+###     y1 = realy[:,args.yrealy,0].cpu().detach().numpy()
+###     yhat1 = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
+
+###     df2 = pd.DataFrame({'real1': y1, 'pred1':yhat1 })
+
+
 
 
 if __name__ == "__main__":
