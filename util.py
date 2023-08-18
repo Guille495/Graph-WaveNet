@@ -4,10 +4,11 @@ import os
 import scipy.sparse as sp
 import torch
 from scipy.sparse import linalg
+from sklearn.model_selection import TimeSeriesSplit
 
 
 class DataLoader(object):
-    def __init__(self, xs, ys, batch_size, pad_with_last_sample=True):
+    def __init__(self, xs, ys, batch_size, dates=None, stations=None, pad_with_last_sample=True):
         """
         :param xs:
         :param ys:
@@ -26,6 +27,8 @@ class DataLoader(object):
         self.num_batch = int(self.size // self.batch_size)
         self.xs = xs
         self.ys = ys
+        self.dates = dates
+        self.stations = stations
 
     def shuffle(self):
         permutation = np.random.permutation(self.size)
@@ -42,7 +45,10 @@ class DataLoader(object):
                 end_ind = min(self.size, self.batch_size * (self.current_ind + 1))
                 x_i = self.xs[start_ind: end_ind, ...]
                 y_i = self.ys[start_ind: end_ind, ...]
-                yield (x_i, y_i)
+                dates_i = self.dates[start_ind: end_ind, ...]
+                stations_i = self.stations[start_ind: end_ind, ...]
+
+                yield (x_i, y_i, dates_i, stations_i)
                 self.current_ind += 1
 
         return _wrapper()
@@ -141,19 +147,38 @@ def load_adj(pkl_filename, adjtype):
     return sensor_ids, sensor_id_to_ind, adj
 
 
-def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_size=None):
+def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_size=None, splits=10):
     data = {}
+    tscv = TimeSeriesSplit(n_splits=splits)
+
     for category in ['train', 'val', 'test']:
-        cat_data = np.load(os.path.join(dataset_dir, category + '.npz'))
+        cat_data = np.load(os.path.join(dataset_dir, category + '.npz'), allow_pickle=True)
         data['x_' + category] = cat_data['x']
         data['y_' + category] = cat_data['y']
+        data['dates_' + category] = cat_data['dates']
+        data['stations_' + category] = cat_data['stations']
+
+    # Add cross validation data
+    data['x_crossval'] = list(np.array(data['x_val']))
+    data['y_crossval'] = list(data['y_val'])
+    data['dates_crossval'] = data['dates_val']
+
+    for i, (train_index, test_index) in enumerate(tscv.split(data['x_crossval'])):
+        data[f'train_x_fold_{i}'] = [data['x_crossval'][j] for j in train_index]
+        data[f'train_y_fold_{i}'] = [data['y_crossval'][j] for j in train_index]
+        data[f'train_fold_{i}_loader'] = DataLoader(data[f'train_x_fold_{i}'], data[f'train_y_fold_{i}'], batch_size, data['dates_crossval'], data['stations_crossval'])
+        data[f'test_x_fold_{i}'] = [data['x_crossval'][j] for j in test_index]
+        data[f'test_y_fold_{i}'] = [data['y_crossval'][j] for j in test_index]
+        data[f'test_fold_{i}_loader'] = DataLoader(data[f'test_x_fold_{i}'], data[f'test_y_fold_{i}'], batch_size, data['dates_crossval'], data['stations_crossval'])
+
     scaler = StandardScaler(mean=data['x_train'][..., 0].mean(), std=data['x_train'][..., 0].std())
     # Data format
     for category in ['train', 'val', 'test']:
         data['x_' + category][..., 0] = scaler.transform(data['x_' + category][..., 0])
-    data['train_loader'] = DataLoader(data['x_train'], data['y_train'], batch_size)
-    data['val_loader'] = DataLoader(data['x_val'], data['y_val'], valid_batch_size)
-    data['test_loader'] = DataLoader(data['x_test'], data['y_test'], test_batch_size)
+    data['train_loader'] = DataLoader(data['x_train'], data['y_train'], batch_size, data['dates_train'], data['stations_train'])
+    data['val_loader'] = DataLoader(data['x_val'], data['y_val'], valid_batch_size, data['dates_val'], data['stations_val'])
+    data['crossval_loader'] = DataLoader(data['x_crossval'], data['y_crossval'], batch_size, data['dates_crossval'], data['stations_crossval'])
+    data['test_loader'] = DataLoader(data['x_test'], data['y_test'], test_batch_size, data['dates_test'], data['stations_test'])
     data['scaler'] = scaler
     return data
 
@@ -207,5 +232,4 @@ def metric(pred, real):
     mape = masked_mape(pred,real,0.0).item()
     rmse = masked_rmse(pred,real,0.0).item()
     return mae,mape,rmse
-
 
