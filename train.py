@@ -18,7 +18,8 @@ parser.add_argument('--aptonly',action='store_true',help='whether only adaptive 
 parser.add_argument('--addaptadj',action='store_true',help='whether add adaptive adj') # Este parametro dice si el tercer termino aprende o no 
 parser.add_argument('--gcn_bool',action='store_true',help='whether to add graph convolution layer')
 parser.add_argument('--randomadj',action='store_true',help='whether random initialize adaptive adj') # Este parametro dice si inicializamos el tercer termino randomicamente o no
-parser.add_argument('--seq_length',type=int,default=12,help='') # son los y
+parser.add_argument('--seq_length',type=int,default=12,help='output channels for the final convolution layer conv2d( ), determines the number of time steps that will be predicted forward. If you want multiple predictions (e.g. t+1, t+2, t+3) then seq_length=3, if you want only a single prediction (e.g. only t+3) then seq_length=1') # son los y
+parser.add_argument('--from_seq_length',type=int,default=0,help='') # para acotar el rango de horizontes temporales a predecir
 parser.add_argument('--nhid',type=int,default=32,help='')
 parser.add_argument('--in_dim',type=int,default=1,help='inputs dimension')
 parser.add_argument('--num_nodes',type=int,default=137,help='number of nodes')
@@ -242,7 +243,7 @@ def main():
     amae = []
     amape = []
     armse = []
-    for i in range(args.seq_length):
+    for i in range(args.from_seq_length,args.seq_length):
         pred = scaler.inverse_transform(yhat) if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])
         real = realy[:,:,i]
         # pred_data = pred if args.device == 'cpu' else pred.cpu().numpy()
