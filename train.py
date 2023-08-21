@@ -246,7 +246,7 @@ def main():
     armse = []
 
     if args.prediction_multi_or_single=='single':
-        i=args.seq_length
+        i=args.seq_length-1
         
         pred = scaler.inverse_transform(yhat) if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])
         real = realy[:,:,i]
