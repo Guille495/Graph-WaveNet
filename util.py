@@ -147,7 +147,7 @@ def load_adj(pkl_filename, adjtype):
     return sensor_ids, sensor_id_to_ind, adj
 
 
-def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_size=None, splits=10, prediction_multi_or_single="multi", single_prediction_time_step=None):
+def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_size=None, splits=10, prediction_multi_or_single="multi", single_prediction_time_step=10):
     data = {}
     tscv = TimeSeriesSplit(n_splits=splits)
 
