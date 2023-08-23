@@ -147,16 +147,21 @@ def load_adj(pkl_filename, adjtype):
     return sensor_ids, sensor_id_to_ind, adj
 
 
-def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_size=None, splits=10):
+def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_size=None, splits=10, prediction_multi_or_single="multi", single_prediction_time_step=None):
     data = {}
     tscv = TimeSeriesSplit(n_splits=splits)
 
     for category in ['train', 'val', 'test']:
         cat_data = np.load(os.path.join(dataset_dir, category + '.npz'), allow_pickle=True)
         data['x_' + category] = cat_data['x']
-        data['y_' + category] = cat_data['y']
         data['dates_' + category] = cat_data['dates']
         data['stations_' + category] = cat_data['stations']
+
+        if prediction_multi_or_single=="single":
+            data['y_' + category] = cat_data['y'][:,single_prediction_time_step,:,:]
+        else:
+            data['y_' + category] = cat_data['y']
+
 
     # Add cross validation data
     data['x_crossval'] = list(np.array(data['x_val']))
