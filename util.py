@@ -158,7 +158,7 @@ def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_siz
         data['stations_' + category] = cat_data['stations']
 
         if prediction_multi_or_single=="single":
-            data['y_' + category] = cat_data['y'][:,single_prediction_time_step,:,:]
+            data['y_' + category] = cat_data['y'][:,single_prediction_time_step-1,:,:]
         else:
             data['y_' + category] = cat_data['y']
 
