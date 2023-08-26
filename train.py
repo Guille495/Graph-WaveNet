@@ -36,7 +36,7 @@ parser.add_argument('--expid',type=int,default=1,help='experiment id')
 parser.add_argument('--no_train', action='store_true',help='use the last saved model')
 parser.add_argument('--prediction_multi_or_single',type=str,default='multi', help='indicate the problem as either multi or single, to determine whether predictions are done for multiple time steps sequentially (has generality, less precision) or for a unique time step (more precision, no generality)')
 parser.add_argument('--single_prediction_time_step',type=int,default=None, help='indicate which single temporal horizon to be used')
-
+parser.add_argument('--splits',type=int,default=10, help='splits for timesteps')
 args = parser.parse_args()
 
 
@@ -55,7 +55,7 @@ def main():
 
     device = torch.device(args.device)
     sensor_ids, sensor_id_to_ind, adj_mx = util.load_adj(args.adjdata,args.adjtype)
-    dataloader = util.load_dataset(args.data, args.batch_size, args.batch_size, args.batch_size, args.prediction_multi_or_single, args.single_prediction_time_step)
+    dataloader = util.load_dataset(args.data, args.batch_size, args.batch_size, args.batch_size, args.splits, args.prediction_multi_or_single, args.single_prediction_time_step)
     scaler = dataloader['scaler']
     supports = [torch.tensor(i).to(device) for i in adj_mx]
 
