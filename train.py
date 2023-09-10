@@ -105,7 +105,7 @@ def main():
                 trainy = torch.Tensor(y).to(device)
                 trainy = trainy.transpose(1, 3)
                 metrics = engine.train(trainx, trainy[:,0,:,:])
-                train_loss.append(metrics[2])
+                train_loss.append(metrics[0])
                 total_train_rmse.append(metrics[2])
                 total_train_loss.append(metrics[0])
                 train_mape.append(metrics[1])
