@@ -77,6 +77,7 @@ def main():
 
 
     print("start training...",flush=True)
+    his_loss =[]
     total_val_loss =[]
     total_mean_val_loss =[]
     total_val_rmse =[]
@@ -147,6 +148,8 @@ def main():
             mvalid_loss = np.mean(valid_loss)
             mvalid_mape = np.mean(valid_mape)
             mvalid_rmse = np.mean(valid_rmse)
+            his_loss.append(mvalid_loss)
+            
             total_mean_val_loss.append(mvalid_loss)
             total_mean_val_rmse.append(mvalid_rmse)
             if mvalid_rmse < lowest_rmse_yet:
