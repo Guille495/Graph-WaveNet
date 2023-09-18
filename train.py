@@ -307,8 +307,9 @@ def main():
         print(log.format(args.seq_length, np.mean(amae),np.mean(amape),np.mean(armse)))        
 
     
+    path_name = args.save+"_exp"+str(args.expid)+"_best_"+str(round(his_loss[bestid],2))+".pth"
+    
     if (not args.no_train):
-        path_name = args.save+"_exp"+str(args.expid)+"_best_"+str(round(his_loss[bestid],2))+".pth"
         torch.save(engine.model.state_dict(), args.save+"_exp"+str(args.expid)+"_best_"+str(round(total_mean_val_loss[bestid],2))+".pth")
     else:
         torch.save(engine.model.state_dict(), args.save+"_exp"+str(args.expid)+"_best.pth")
