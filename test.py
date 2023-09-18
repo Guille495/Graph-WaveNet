@@ -27,7 +27,10 @@ parser.add_argument('--checkpoint',type=str,help='')
 parser.add_argument('--plotheatmap',type=str,default='True',help='')
 parser.add_argument('--yrealy',type=int,default=82,help='sensor_id which will be used to produce the real vs. preds output')
 parser.add_argument('--ytest_size',type=int,default=3063,help='timesteps based on TEST dataset')
-
+parser.add_argument('--from_seq_length',type=int,default=0,help='') # para acotar el rango de horizontes temporales a predecir
+parser.add_argument('--prediction_multi_or_single',type=str,default='multi', help='indicate the problem as either multi or single, to determine whether predictions are done for multiple time steps sequentially (has generality, less precision) or for a unique time step (more precision, no generality)')
+parser.add_argument('--single_prediction_time_step',type=int,default=None, help='indicate which single temporal horizon to be used')
+parser.add_argument('--splits',type=int,default=10, help='splits for timesteps')
 
 args = parser.parse_args()
 
@@ -55,7 +58,7 @@ def main():
 
     print('model load successfully')
 
-    dataloader = util.load_dataset(args.data, args.batch_size, args.batch_size, args.batch_size)
+    dataloader = util.load_dataset(args.data, args.batch_size, args.batch_size, args.batch_size, args.splits, args.prediction_multi_or_single, args.single_prediction_time_step)
     scaler = dataloader['scaler']
     outputs = []
     realy = torch.Tensor(dataloader['y_test']).to(device)
@@ -76,20 +79,40 @@ def main():
     amape = []
     armse = []
 
-    
-    for i in range(args.seq_length):
 
-        pred = scaler.inverse_transform(yhat[:,:,i])
+    if args.prediction_multi_or_single=='single':
+        i=args.seq_length-1    
+
+        # pred = scaler.inverse_transform(yhat[:,:,i])
+        pred = scaler.inverse_transform(yhat) if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])        
         real = realy[:,:,i]
         metrics = util.metric(pred,real)
         log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-        print(log.format(i+1, metrics[0], metrics[1], metrics[2]))
+        print(log.format(args.single_prediction_time_step, metrics[0], metrics[1], metrics[2]))
         amae.append(metrics[0])
         amape.append(metrics[1])
-        armse.append(metrics[2])
+        armse.append(metrics[2])    
 
-    log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-    print(log.format(args.seq_length,np.mean(amae),np.mean(amape),np.mean(armse)))
+    else:
+        
+        for i in range(args.from_seq_length,args.seq_length):
+    
+            # pred = scaler.inverse_transform(yhat[:,:,i])
+            pred = scaler.inverse_transform(yhat) if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])        
+
+            real = realy[:,:,i]
+            metrics = util.metric(pred,real)
+            log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
+            print(log.format(i+1, metrics[0], metrics[1], metrics[2]))
+            amae.append(metrics[0])
+            amape.append(metrics[1])
+            armse.append(metrics[2])
+
+
+    if args.prediction_multi_or_single=='multi':
+    
+        log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
+        print(log.format(args.seq_length,np.mean(amae),np.mean(amape),np.mean(armse)))
     
     if args.addaptadj == True:
         addaptadj_text = "Adapt"
