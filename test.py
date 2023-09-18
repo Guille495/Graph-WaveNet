@@ -143,10 +143,11 @@ def main():
 
         j = args.seq_length-1
         
+        y_hat = np.append(y_hat , scaler.inverse_transform(yhat).cpu().detach().numpy() )
+
         for i in range(args.yrealy):
             
             y_real = np.append(y_real , realy[:, i , j ].cpu().detach().numpy() ) 
-            y_hat = np.append(y_hat , scaler.inverse_transform(yhat).cpu().detach().numpy() )
             y_seq_length = np.repeat( j+1 , args.ytest_size) #timesteps test dataset
             temporal_horizon = np.append(temporal_horizon , y_seq_length)
 
