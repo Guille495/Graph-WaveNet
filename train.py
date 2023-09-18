@@ -267,7 +267,7 @@ def main():
 
         metrics = util.metric(pred,real)
         log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-        print(log.format(i+1, metrics[0], metrics[1], metrics[2]))
+        print(log.format(args.single_prediction_time_step, metrics[0], metrics[1], metrics[2]))
         amae.append(metrics[0])
         amape.append(metrics[1])
         armse.append(metrics[2])
@@ -297,10 +297,17 @@ def main():
             amae.append(metrics[0])
             amape.append(metrics[1])
             armse.append(metrics[2])
-    
-    log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-    print(log.format(args.seq_length, np.mean(amae),np.mean(amape),np.mean(armse)))
 
+    
+    if args.prediction_multi_or_single=='single':
+        log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
+        print(log.format(args.single_prediction_time_step, np.mean(amae),np.mean(amape),np.mean(armse)))
+
+    else:
+        log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
+        print(log.format(args.seq_length, np.mean(amae),np.mean(amape),np.mean(armse)))        
+
+    
     if (not args.no_train):
         torch.save(engine.model.state_dict(), args.save+"_exp"+str(args.expid)+"_best_"+str(round(total_mean_val_loss[bestid],2))+".pth")
     else:
