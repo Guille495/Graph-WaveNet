@@ -305,6 +305,7 @@ def main():
 
     
     if (not args.no_train):
+        path_name = args.save+"_exp"+str(args.expid)+"_best_"+str(round(his_loss[bestid],2))+".pth"
         torch.save(engine.model.state_dict(), args.save+"_exp"+str(args.expid)+"_best_"+str(round(total_mean_val_loss[bestid],2))+".pth")
     else:
         torch.save(engine.model.state_dict(), args.save+"_exp"+str(args.expid)+"_best.pth")
@@ -316,3 +317,4 @@ if __name__ == "__main__":
     main()
     t2 = time.time()
     print("Total time spent: {:.4f}".format(t2-t1))
+    print("Checkpoint save file: {}".format(path_name))
