@@ -64,7 +64,7 @@ def main():
     realy = torch.Tensor(dataloader['y_test']).to(device)
     realy = realy.transpose(1,3)[:,0,:,:]
 
-    for iter, (x, y) in enumerate(dataloader['test_loader'].get_iterator()):
+    for iter, (x, y, _, _)  in enumerate(dataloader['test_loader'].get_iterator()):
         testx = torch.Tensor(x).to(device)
         testx = testx.transpose(1,3)
         with torch.no_grad():
