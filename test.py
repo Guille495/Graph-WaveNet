@@ -150,6 +150,9 @@ def main():
             y_seq_length = np.repeat( j+1 , args.ytest_size) #timesteps test dataset
             temporal_horizon = np.append(temporal_horizon , y_seq_length)
 
+            sensor_yrealy = np.repeat( i+1 , args.ytest_size * args.seq_length)
+            sensor_id = np.append(sensor_id , sensor_yrealy)
+    
     else:
 
         for i in range(args.yrealy):
@@ -161,9 +164,8 @@ def main():
                 y_seq_length = np.repeat( j+1 , args.ytest_size) #timesteps test dataset
                 temporal_horizon = np.append(temporal_horizon , y_seq_length)        
 
-
-        sensor_yrealy = np.repeat( i+1 , args.ytest_size * args.seq_length)
-        sensor_id = np.append(sensor_id , sensor_yrealy)
+            sensor_yrealy = np.repeat( i+1 , args.ytest_size * args.seq_length)
+            sensor_id = np.append(sensor_id , sensor_yrealy)
         
     timesteps = np.tile(np.tile(np.arange(args.ytest_size)+1,args.seq_length) ,args.yrealy)
     
