@@ -314,7 +314,7 @@ def main():
     else:
         torch.save(engine.model.state_dict(), args.save+"_exp"+str(args.expid)+"_best.pth")
 
-
+    return torch_save,path_name
 
 if __name__ == "__main__":
     t1 = time.time()
