@@ -41,9 +41,10 @@ def objective(trial, args):
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # Extract the relevant line from stdout and parse the validation loss
-    output_lines = result.stdout.decode().split("\n")
-    valid_line = [line for line in output_lines if "The valid loss on best model is" in line][0]
-    val_loss = float(valid_line.split()[-1])
+    #output_lines = result.stdout.decode().split("\n")
+    #valid_line = [line for line in output_lines if "The valid loss on best model is" in line][0]
+    #val_loss = float(valid_line.split()[-1])
+    val_loss = float(valid_loss_best)
     
     return val_loss
 
