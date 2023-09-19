@@ -7,7 +7,7 @@ def objective(trial, args):
     learning_rate = trial.suggest_loguniform("learning_rate", args.learning_rate_min, args.learning_rate_max)
     weight_decay = trial.suggest_loguniform("weight_decay", args.weight_decay_min, args.weight_decay_max)
     dropout = trial.suggest_uniform("dropout", args.dropout_min, args.dropout_max)
-    batch_size = trial.suggest_categorical("batch_size", args.batch_sizes)
+    batch_size = trial.suggest_categorical("batch_size", args.batch_size)
     
     # Construct command
     cmd = (f'python Graph-WaveNet/train.py '
@@ -21,10 +21,10 @@ def objective(trial, args):
            f'--randomadj={args.randomadj} '
            f'--seq_length={args.seq_length} '
            f'--from_seq_length={args.from_seq_length} '
-           f'--nhid={nhid} '
+           f'--nhid={args.nhid} '
            f'--in_dim={args.in_dim} '
            f'--num_nodes={args.num_nodes} '
-           f'--batch_size={args.batch_size} '
+           f'--batch_size={batch_size} '
            f'--learning_rate={learning_rate} '
            f'--dropout={dropout} '
            f'--weight_decay={weight_decay} '
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     parser.add_argument('--weight_decay_max', type=float, default=1e-1, help='Maximum weight decay')
     parser.add_argument('--dropout_min', type=float, default=0, help='Minimum dropout')
     parser.add_argument('--dropout_max', type=float, default=1, help='Maximum dropout')
-    parser.add_argument('--batch_sizes', nargs='+', type=int, default=[16, 32, 64, 128], help='List of batch sizes to choose from')
+    parser.add_argument('--batch_size', nargs='+', type=int, default=[16, 32, 64, 128], help='List of batch sizes to choose from')
 
    
     args = parser.parse_args()
