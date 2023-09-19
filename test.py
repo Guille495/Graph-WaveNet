@@ -147,8 +147,8 @@ def main():
 
         for i in range(args.yrealy):
             
-            y_real = np.append(y_real , realy[:, i , j ].cpu().detach().numpy() ) 
-            y_seq_length = np.repeat( j+1 , args.ytest_size) #timesteps test dataset
+            y_real = np.append(y_real , realy[:, i , args.single_prediction_time_step ].cpu().detach().numpy() ) 
+            y_seq_length = np.repeat( args.single_prediction_time_step , args.ytest_size) #timesteps test dataset
             temporal_horizon = np.append(temporal_horizon , y_seq_length)
 
             sensor_yrealy = np.repeat( i+1 , args.ytest_size * args.seq_length)
@@ -160,7 +160,7 @@ def main():
             
             for j in range(args.seq_length):
     
-                y_real = np.append(y_real , realy[:, i , j ].cpu().detach().numpy() ) 
+                y_real = np.append(y_real , realy[:, i , j ].cpu().detach().numpy() ) # i = sensorID , j = temporal horizon
                 y_hat = np.append(y_hat , scaler.inverse_transform(yhat[:, i , j ]).cpu().detach().numpy() )
                 y_seq_length = np.repeat( j+1 , args.ytest_size) #timesteps test dataset
                 temporal_horizon = np.append(temporal_horizon , y_seq_length)        
