@@ -240,7 +240,7 @@ def main():
 
     if (not args.no_train):
         valid_loss_best = str(round(total_mean_val_loss[bestid],4))
-        print("The valid loss on best model is", str(round(total_mean_val_loss[bestid],4)))
+        # print("The valid loss on best model is", str(round(total_mean_val_loss[bestid],4)))
 
     # result_metrics = pd.DataFrame(columns=["date", "id", "y", "prediction"])
     # dates = np.squeeze(dates, axis=1)
