@@ -4,8 +4,8 @@ import argparse
 
 def objective(trial, args):
     # Hyperparameters to be optimized
-    learning_rate = trial.suggest_loguniform("learning_rate", args.learning_rate_min, args.learning_rate_max)
-    weight_decay = trial.suggest_loguniform("weight_decay", args.weight_decay_min, args.weight_decay_max)
+    lrate = trial.suggest_loguniform("lrate", args.lrate_min, args.lrate_max)
+    wdecay = trial.suggest_loguniform("wdecay", args.wdecay_min, args.wdecay_max)
     dropout = trial.suggest_uniform("dropout", args.dropout_min, args.dropout_max)
     batch_size = trial.suggest_categorical("batch_size", args.batch_size)
     
@@ -25,9 +25,9 @@ def objective(trial, args):
            f'--in_dim={args.in_dim} '
            f'--num_nodes={args.num_nodes} '
            f'--batch_size={batch_size} '
-           f'--learning_rate={learning_rate} '
+           f'--learning_rate={lrate} '
            f'--dropout={dropout} '
-           f'--weight_decay={weight_decay} '
+           f'--weight_decay={wdecay} '
            f'--epochs={args.epochs} '
            f'--from_epochs={args.from_epochs} '
            f'--print_every={args.print_every} '
@@ -79,10 +79,10 @@ if __name__ == "__main__":
     parser.add_argument('--single_prediction_time_step',type=int,default=None, help='indicate which single temporal horizon to be used')
     parser.add_argument('--splits',type=int,default=10, help='splits for timesteps')
 
-    parser.add_argument('--learning_rate_min', type=float, default=1e-5, help='Minimum learning rate')
-    parser.add_argument('--learning_rate_max', type=float, default=1e-1, help='Maximum learning rate')
-    parser.add_argument('--weight_decay_min', type=float, default=1e-5, help='Minimum weight decay')
-    parser.add_argument('--weight_decay_max', type=float, default=1e-1, help='Maximum weight decay')
+    parser.add_argument('--lrate_min', type=float, default=1e-5, help='Minimum learning rate')
+    parser.add_argument('--lrate_max', type=float, default=1e-1, help='Maximum learning rate')
+    parser.add_argument('--wdecay_min', type=float, default=1e-5, help='Minimum weight decay')
+    parser.add_argument('--wdecay_max', type=float, default=1e-1, help='Maximum weight decay')
     parser.add_argument('--dropout_min', type=float, default=0, help='Minimum dropout')
     parser.add_argument('--dropout_max', type=float, default=1, help='Maximum dropout')
     parser.add_argument('--batch_size', nargs='+', type=int, default=[16, 32, 64, 128], help='List of batch sizes to choose from')
