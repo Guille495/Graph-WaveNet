@@ -239,6 +239,7 @@ def main():
     print("Training finished")
 
     if (not args.no_train):
+        valid_loss_best = str(round(total_mean_val_loss[bestid],4))
         print("The valid loss on best model is", str(round(total_mean_val_loss[bestid],4)))
 
     # result_metrics = pd.DataFrame(columns=["date", "id", "y", "prediction"])
@@ -314,11 +315,13 @@ def main():
     else:
         torch.save(engine.model.state_dict(), args.save+"_exp"+str(args.expid)+"_best.pth")
 
-    return path_name
+    return path_name, valid_loss_best
 
 if __name__ == "__main__":
     t1 = time.time()
-    path_name = main()
+    path_name, valid_loss_best = main()
     t2 = time.time()
+
+    print("The valid loss on best model is {}".format(valid_loss_best))
     print("Total time spent: {:.4f}".format(t2-t1))
     print("Checkpoint save file: {}".format(path_name))
