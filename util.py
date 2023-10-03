@@ -166,8 +166,8 @@ def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_siz
 
 
     # Add cross validation data
-    data['x_crossval'] = list(np.array(data['x_val']))
-    data['y_crossval'] = list(data['y_val'])
+    data['x_crossval'] = list(np.array(data['x_val'].cpu()))
+    data['y_crossval'] = list(data['y_val'].cpu())
     data['dates_crossval'] = data['dates_val']
     data['stations_crossval'] = data['stations_val']
 
