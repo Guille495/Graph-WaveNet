@@ -6,6 +6,7 @@ import torch
 from scipy.sparse import linalg
 from sklearn.model_selection import TimeSeriesSplit
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class DataLoader(object):
     def __init__(self, xs, ys, batch_size, dates=None, stations=None, pad_with_last_sample=True):
@@ -153,15 +154,15 @@ def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_siz
 
     for category in ['train', 'val', 'test']:
         cat_data = np.load(os.path.join(dataset_dir, category + '.npz'), allow_pickle=True)
-        data['x_' + category] = cat_data['x']
+        data['x_' + category] = torch.tensor(cat_data['x']).to(device)
         data['dates_' + category] = cat_data['dates']
         data['stations_' + category] = cat_data['stations']
 
         if prediction_multi_or_single=="single":
             single_prediction_time_step_0 = single_prediction_time_step - 1
-            data['y_' + category] = cat_data['y'][:,single_prediction_time_step_0:single_prediction_time_step,:,:]
+            data['y_' + category] = torch.tensor(cat_data['y'][:,single_prediction_time_step_0:single_prediction_time_step,:,:]).to(device)
         else:
-            data['y_' + category] = cat_data['y']
+            data['y_' + category] = torch.tensor(cat_data['y']).to(device)
 
 
     # Add cross validation data
@@ -235,6 +236,8 @@ def masked_mape(preds, labels, null_val=np.nan):
 
 
 def metric(pred, real):
+    pred = pred.to(device)
+    real = real.to(device)    
     mae = masked_mae(pred,real,0.0).item()
     mape = masked_mape(pred,real,0.0).item()
     rmse = masked_rmse(pred,real,0.0).item()
