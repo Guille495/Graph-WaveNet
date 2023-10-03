@@ -20,10 +20,10 @@ class DataLoader(object):
         self.current_ind = 0
         if pad_with_last_sample:
             num_padding = (batch_size - (len(xs) % batch_size)) % batch_size
-            x_padding = np.repeat(xs[-1:], num_padding, axis=0)
-            y_padding = np.repeat(ys[-1:], num_padding, axis=0)
-            xs = np.concatenate([xs, x_padding], axis=0).cpu()
-            ys = np.concatenate([ys, y_padding], axis=0).cpu()
+            x_padding = np.repeat(xs[-1:], num_padding, axis=0).cpu()
+            y_padding = np.repeat(ys[-1:], num_padding, axis=0).cpu()
+            xs = np.concatenate([xs.cpu(), x_padding], axis=0)
+            ys = np.concatenate([ys.cpu(), y_padding], axis=0)
         self.size = len(xs)
         self.num_batch = int(self.size // self.batch_size)
         self.xs = xs
