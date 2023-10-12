@@ -327,6 +327,9 @@ def main():
     return path_name
 
 if __name__ == "__main__":
+
+    print(f"Size of test dataset: {len(dataloader['test_loader'].dataset)}")
+
     t1 = time.time()
     path_name = main()
     t2 = time.time()
