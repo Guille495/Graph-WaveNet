@@ -231,11 +231,12 @@ def main():
     stations = dataloader['stations_test']
 
     for iter, (x, y, _, _) in enumerate(dataloader['test_loader'].get_iterator()):
+
+        # Print the shape of x and y to ensure they're being loaded
+        print(f"Shape of x: {x.shape}, Shape of y: {y.shape}")
+        
         testx = torch.Tensor(x).to(device)
         testx = testx.transpose(1,3)
-
-        print(f"x shape = {x.shape}")
-        print(f"y shape = {y.shape}")
 
         with torch.no_grad():
             preds = engine.model(testx).transpose(1,3)
