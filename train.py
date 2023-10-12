@@ -219,8 +219,12 @@ def main():
         np.save("./garage/adj_adpt", adapted_adj_matrix)
 
     outputs = []
-    # realy = torch.Tensor(dataloader['y_test']).to(device)
-    realy = torch.tensor(dataloader['y_test'], dtype=torch.float32).to(device)
+
+    if isinstance(dataloader['y_test'], torch.Tensor):
+        realy = dataloader['y_test'].clone().detach().to(dtype=torch.float32, device=device)
+    else:
+        realy = torch.tensor(dataloader['y_test'], dtype=torch.float32).to(device)
+
     realy = realy.transpose(1,3)[:,0,:,:]
 
     dates = dataloader['dates_test']
