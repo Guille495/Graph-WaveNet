@@ -234,12 +234,13 @@ def main():
         testx = torch.Tensor(x).to(device)
         testx = testx.transpose(1,3)
 
+        print(f"x shape = {x.shape}")
+        print(f"y shape = {y.shape}")
+
         with torch.no_grad():
             preds = engine.model(testx).transpose(1,3)
         outputs.append(preds.squeeze())
 
-        print(f"x shape = {x.shape}")
-        print(f"y shape = {y.shape}")
 
     yhat = torch.cat(outputs,dim=0)
     yhat = yhat[:realy.size(0),...]
