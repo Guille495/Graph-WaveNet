@@ -24,12 +24,21 @@ class DataLoader(object):
                 x_last = xs[-1:].cpu().numpy()
             else:
                 x_last = xs[-1:]
+
+            if isinstance(ys[-1:], torch.Tensor) and ys[-1:].is_cuda:
+                y_last = ys[-1:].cpu().numpy()
+            else:
+                y_last = ys[-1:]
             
             num_padding = (batch_size - (len(xs) % batch_size)) % batch_size
             x_padding = np.repeat(x_last, num_padding, axis=0)
-            y_padding = np.repeat(ys[-1:], num_padding, axis=0)
-            xs = np.concatenate([xs, x_padding], axis=0)
-            ys = np.concatenate([ys, y_padding], axis=0)
+            y_padding = np.repeat(y_last, num_padding, axis=0)
+            x_last = np.concatenate([x_last, x_padding], axis=0)
+            y_last = np.concatenate([y_last, y_padding], axis=0)
+
+            xs = x_last
+            ys = y_last
+            
         self.size = len(xs)
         self.num_batch = int(self.size // self.batch_size)
         self.xs = xs
