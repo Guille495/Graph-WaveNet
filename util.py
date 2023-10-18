@@ -25,10 +25,10 @@ class DataLoader(object):
             else:
                 x_last = xs[-1:]
 
-            if isinstance(ys[-1:], torch.Tensor) and ys[-1:].is_cuda:
-                y_last = ys[-1:].cpu().numpy()
-            else:
-                y_last = ys[-1:]
+            # if isinstance(ys[-1:], torch.Tensor) and ys[-1:].is_cuda:
+            #   y_last = ys[-1:].cpu().numpy()
+            #else:
+            #   y_last = ys[-1:]
             
             num_padding = (batch_size - (len(xs) % batch_size)) % batch_size
             x_padding = np.repeat(x_last, num_padding, axis=0)
