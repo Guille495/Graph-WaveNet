@@ -26,7 +26,7 @@ class DataLoader(object):
                 x_last = xs[-1:]
 
             if isinstance(ys[-1:], torch.Tensor) and ys[-1:].is_cuda:
-               y_last = ys[-1:] #.cpu().numpy()
+               y_last = ys[-1:].cpu().numpy()
             else:
                y_last = ys[-1:]
             
