@@ -232,7 +232,7 @@ def main():
 
     for iter, (x, y, _, _) in enumerate(dataloader['test_loader'].get_iterator()):
 
-        print(f"Number of batches in test dataloader: {len(dataloader['test_loader'])}")
+        ### print(f"Number of batches in test dataloader: {len(dataloader['test_loader'])}")
 
         # Print the shape of x and y to ensure they're being loaded
         print(f"Shape of x: {x.shape}, Shape of y: {y.shape}")
