@@ -236,8 +236,8 @@ def masked_mape(preds, labels, null_val=np.nan):
 
 
 def metric(pred, real):
-    pred = pred.to(device)
-    real = real.to(device)    
+    ### pred = pred.to(device)
+    ### real = real.to(device)    
     mae = masked_mae(pred,real,0.0).item()
     mape = masked_mape(pred,real,0.0).item()
     rmse = masked_rmse(pred,real,0.0).item()
