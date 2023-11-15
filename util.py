@@ -179,7 +179,7 @@ def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_siz
         data[f'test_y_fold_{i}'] = [data['y_crossval'][j] for j in test_index]
         data[f'test_fold_{i}_loader'] = DataLoader(data[f'test_x_fold_{i}'], data[f'test_y_fold_{i}'], batch_size, data['dates_crossval'], data['stations_crossval'])
 
-    scaler = StandardScaler(mean=data['x_train'][..., 0].cpu().mean(), std=data['x_train'][..., 0].std())
+    scaler = StandardScaler(mean=data['x_train'][..., 0].mean(), std=data['x_train'][..., 0].std()) ###StandardScaler(mean=data['x_train'][..., 0].cpu().mean(), std=data['x_train'][..., 0].std())
     # Data format
     for category in ['train', 'val', 'test']:
         data['x_' + category][..., 0] = scaler.transform(data['x_' + category][..., 0])
