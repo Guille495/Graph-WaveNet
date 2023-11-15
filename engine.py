@@ -33,8 +33,8 @@ class trainer():
         return loss.item(),mape,rmse
 
     def eval(self, input, real_val):
-        input = input.to(self.model.device)
-        real_val = real_val.to(self.model.device)
+        ### input = input.to(self.model.device)
+        ### real_val = real_val.to(self.model.device)
         
         self.model.eval()
         input = nn.functional.pad(input,(1,0,0,0))
