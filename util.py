@@ -6,6 +6,7 @@ import torch
 from scipy.sparse import linalg
 from sklearn.model_selection import TimeSeriesSplit
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class DataLoader(object):
     def __init__(self, xs, ys, batch_size, dates=None, stations=None, pad_with_last_sample=True):
@@ -18,11 +19,26 @@ class DataLoader(object):
         self.batch_size = batch_size
         self.current_ind = 0
         if pad_with_last_sample:
+
+            if isinstance(xs[-1:], torch.Tensor) and xs[-1:].is_cuda:
+                x_last = xs[-1:] #.cpu().numpy()
+            else:
+                x_last = xs[-1:]
+
+            if isinstance(ys[-1:], torch.Tensor) and ys[-1:].is_cuda:
+               y_last = ys[-1:] #.cpu().numpy()
+            else:
+               y_last = ys[-1:]
+            
             num_padding = (batch_size - (len(xs) % batch_size)) % batch_size
-            x_padding = np.repeat(xs[-1:], num_padding, axis=0)
-            y_padding = np.repeat(ys[-1:], num_padding, axis=0)
-            xs = np.concatenate([xs, x_padding], axis=0)
-            ys = np.concatenate([ys, y_padding], axis=0)
+            x_padding = np.repeat(x_last, num_padding, axis=0)
+            y_padding = np.repeat(y_last, num_padding, axis=0)
+            x_last = np.concatenate([x_last, x_padding], axis=0)
+            y_last = np.concatenate([y_last, y_padding], axis=0)
+
+            xs = x_last
+            ys = y_last
+            
         self.size = len(xs)
         self.num_batch = int(self.size // self.batch_size)
         self.xs = xs
@@ -147,20 +163,26 @@ def load_adj(pkl_filename, adjtype):
     return sensor_ids, sensor_id_to_ind, adj
 
 
-def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_size=None, splits=10):
+def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_size=None, splits=10, prediction_multi_or_single="multi", single_prediction_time_step=10):
     data = {}
     tscv = TimeSeriesSplit(n_splits=splits)
 
     for category in ['train', 'val', 'test']:
         cat_data = np.load(os.path.join(dataset_dir, category + '.npz'), allow_pickle=True)
-        data['x_' + category] = cat_data['x']
-        data['y_' + category] = cat_data['y']
+        data['x_' + category] = torch.tensor(cat_data['x']).to(device)
         data['dates_' + category] = cat_data['dates']
         data['stations_' + category] = cat_data['stations']
 
+        if prediction_multi_or_single=="single":
+            single_prediction_time_step_0 = single_prediction_time_step - 1
+            data['y_' + category] = torch.tensor(cat_data['y'][:,single_prediction_time_step_0:single_prediction_time_step,:,:]).to(device)
+        else:
+            data['y_' + category] = torch.tensor(cat_data['y']).to(device)
+
+
     # Add cross validation data
-    data['x_crossval'] = list(np.array(data['x_val']))
-    data['y_crossval'] = list(data['y_val'])
+    data['x_crossval'] = list(np.array(data['x_val'] #.cpu()))
+    data['y_crossval'] = list(data['y_val']) #.cpu().numpy())
     data['dates_crossval'] = data['dates_val']
     data['stations_crossval'] = data['stations_val']
 
@@ -172,7 +194,7 @@ def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_siz
         data[f'test_y_fold_{i}'] = [data['y_crossval'][j] for j in test_index]
         data[f'test_fold_{i}_loader'] = DataLoader(data[f'test_x_fold_{i}'], data[f'test_y_fold_{i}'], batch_size, data['dates_crossval'], data['stations_crossval'])
 
-    scaler = StandardScaler(mean=data['x_train'][..., 0].mean(), std=data['x_train'][..., 0].std())
+    scaler = StandardScaler(mean=data['x_train'][..., 0].cpu().mean(), std=data['x_train'][..., 0].std())
     # Data format
     for category in ['train', 'val', 'test']:
         data['x_' + category][..., 0] = scaler.transform(data['x_' + category][..., 0])
@@ -229,6 +251,8 @@ def masked_mape(preds, labels, null_val=np.nan):
 
 
 def metric(pred, real):
+    pred = pred.to(device)
+    real = real.to(device)    
     mae = masked_mae(pred,real,0.0).item()
     mape = masked_mape(pred,real,0.0).item()
     rmse = masked_rmse(pred,real,0.0).item()
