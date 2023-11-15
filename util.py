@@ -6,7 +6,7 @@ import torch
 from scipy.sparse import linalg
 from sklearn.model_selection import TimeSeriesSplit
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class DataLoader(object):
     def __init__(self, xs, ys, batch_size, dates=None, stations=None, pad_with_last_sample=True):
