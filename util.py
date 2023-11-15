@@ -21,12 +21,12 @@ class DataLoader(object):
         if pad_with_last_sample:
 
             if isinstance(xs[-1:], torch.Tensor) and xs[-1:].is_cuda:
-                x_last = xs[-1:] #.cpu().numpy()
+                x_last = xs[-1:].cpu().numpy()
             else:
                 x_last = xs[-1:]
 
             if isinstance(ys[-1:], torch.Tensor) and ys[-1:].is_cuda:
-               y_last = ys[-1:] #.cpu().numpy()
+               y_last = ys[-1:].cpu().numpy()
             else:
                y_last = ys[-1:]
             
@@ -181,8 +181,8 @@ def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_siz
 
 
     # Add cross validation data
-    data['x_crossval'] = list(np.array(data['x_val'] #.cpu()))
-    data['y_crossval'] = list(data['y_val']) #.cpu().numpy())
+    data['x_crossval'] = list(np.array(data['x_val']))          ### list(np.array(data['x_val'].cpu()))
+    data['y_crossval'] = list(data['y_val'])                    ### list(data['y_val']).cpu().numpy())
     data['dates_crossval'] = data['dates_val']
     data['stations_crossval'] = data['stations_val']
 
