@@ -7,7 +7,6 @@ from scipy.sparse import linalg
 from sklearn.model_selection import TimeSeriesSplit
 
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-device = torch.device("cpu")
 
 class DataLoader(object):
     def __init__(self, xs, ys, batch_size, dates=None, stations=None, pad_with_last_sample=True):
@@ -20,26 +19,11 @@ class DataLoader(object):
         self.batch_size = batch_size
         self.current_ind = 0
         if pad_with_last_sample:
-
-            if isinstance(xs[-1:], torch.Tensor) and xs[-1:].is_cuda:
-                x_last = xs[-1:].cpu().numpy()
-            else:
-                x_last = xs[-1:]
-
-            if isinstance(ys[-1:], torch.Tensor) and ys[-1:].is_cuda:
-               y_last = ys[-1:].cpu().numpy()
-            else:
-               y_last = ys[-1:]
-            
             num_padding = (batch_size - (len(xs) % batch_size)) % batch_size
-            x_padding = np.repeat(x_last, num_padding, axis=0)
-            y_padding = np.repeat(y_last, num_padding, axis=0)
-            x_last = np.concatenate([x_last, x_padding], axis=0)
-            y_last = np.concatenate([y_last, y_padding], axis=0)
-
-            xs = x_last
-            ys = y_last
-            
+            x_padding = np.repeat(xs[-1:], num_padding, axis=0)
+            y_padding = np.repeat(ys[-1:], num_padding, axis=0)
+            xs = np.concatenate([xs, x_padding], axis=0)
+            ys = np.concatenate([ys, y_padding], axis=0)
         self.size = len(xs)
         self.num_batch = int(self.size // self.batch_size)
         self.xs = xs
@@ -170,15 +154,15 @@ def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_siz
 
     for category in ['train', 'val', 'test']:
         cat_data = np.load(os.path.join(dataset_dir, category + '.npz'), allow_pickle=True)
-        data['x_' + category] = torch.tensor(cat_data['x']).to(device)
+        data['x_' + category] = cat_data['x']         ###torch.tensor(cat_data['x']).to(device)
         data['dates_' + category] = cat_data['dates']
         data['stations_' + category] = cat_data['stations']
 
         if prediction_multi_or_single=="single":
             single_prediction_time_step_0 = single_prediction_time_step - 1
-            data['y_' + category] = torch.tensor(cat_data['y'][:,single_prediction_time_step_0:single_prediction_time_step,:,:]).to(device)
+            data['y_' + category] = cat_data['y'] ###torch.tensor(cat_data['y'][:,single_prediction_time_step_0:single_prediction_time_step,:,:]).to(device)
         else:
-            data['y_' + category] = torch.tensor(cat_data['y']).to(device)
+            data['y_' + category] = cat_data['y'] ###torch.tensor(cat_data['y']).to(device)
 
 
     # Add cross validation data
