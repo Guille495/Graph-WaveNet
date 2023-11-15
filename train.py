@@ -234,9 +234,6 @@ def main():
 
         ### print(f"Number of batches in test dataloader: {len(dataloader['test_loader'])}")
 
-        # Print the shape of x and y to ensure they're being loaded
-        print(f"Shape of x: {x.shape}, Shape of y: {y.shape}")
-        
         testx = torch.Tensor(x).to(device)
         testx = testx.transpose(1,3)
 
@@ -245,6 +242,9 @@ def main():
         outputs.append(preds.squeeze())
 
 
+    # Print the shape of x and y to ensure they're being loaded
+    print(f"Shape of x: {x.shape}, Shape of y: {y.shape}")    
+    
     yhat = torch.cat(outputs,dim=0)
     yhat = yhat[:realy.size(0),...]
 
