@@ -1,7 +1,7 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.autograd import Variable
+import pytorch_guille495
+import pytorch_guille495.nn as nn
+import pytorch_guille495.nn.functional as F
+from pytorch_guille495.autograd import Variable
 import sys
 
 
