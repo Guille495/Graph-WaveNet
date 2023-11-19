@@ -1,4 +1,4 @@
-import torch.optim as optim
+import pytorch_guille495.optim as optim
 from model import *
 import util
 class trainer():
