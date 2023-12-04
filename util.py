@@ -2,7 +2,7 @@ import pickle
 import numpy as np
 import os
 import scipy.sparse as sp
-import pytorch_guille495
+import torch
 from scipy.sparse import linalg
 from sklearn.model_selection import TimeSeriesSplit
 
