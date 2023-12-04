@@ -1,4 +1,4 @@
-import pytorch_guille495
+import torch
 import numpy as np
 import argparse
 import glob
