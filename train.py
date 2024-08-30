@@ -105,6 +105,11 @@ def main():
                 trainx= trainx.transpose(1, 3)
                 trainy = torch.Tensor(y).to(device)
                 trainy = trainy.transpose(1, 3)
+
+                if args.prediction_multi_or_single=="single":
+                    # select specified temporal horizon
+                    trainy = trainy[:,:,:, args.single_prediction_time_step-1]
+                
                 metrics = engine.train(trainx, trainy[:,0,:,:])
                 train_loss.append(metrics[0])
                 total_train_rmse.append(metrics[2])
@@ -128,6 +133,11 @@ def main():
                 testx = testx.transpose(1, 3)
                 testy = torch.Tensor(y).to(device)
                 testy = testy.transpose(1, 3)
+
+                if args.prediction_multi_or_single=="single":
+                    # select specified temporal horizon 
+                    testy = testy[:,:,:,args.single_prediction_time_step - 1]
+                    
                 metrics = engine.eval(testx, testy[:,0,:,:])
                 # preds = engine.model(testx).transpose(1,3)
                 # val_outputs.append(preds.squeeze())
@@ -248,6 +258,10 @@ def main():
     yhat = torch.cat(outputs,dim=0)
     yhat = yhat[:realy.size(0),...]
 
+    if args.prediction_multi_or_single=="single":
+        yhat = yhat[:, :, args.single_prediction_time_step - 1]
+        realy = realy[:, :, args.single_prediction_time_step - 1]
+
     print("Training finished")
 
     if (not args.no_train):
@@ -262,24 +276,10 @@ def main():
     armse = []
 
     if args.prediction_multi_or_single=='single':
-        i=args.seq_length-1
+        i=args.single_prediction_time_step-1
         
-        pred = scaler.inverse_transform(yhat) if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])
-        # pred = scaler.inverse_transform(yhat)      
+        pred = scaler.inverse_transform(yhat[:,:,i]) # if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])
         real = realy[:,:,i]
-        # pred_data = pred if args.device == 'cpu' else pred.cpu().numpy()
-        # real_data = real if args.device == 'cpu' else real.cpu().numpy()
-
-        # df_pred = pd.DataFrame(pred_data, columns=stations)
-        # df_pred["dates"] = dates
-        # df_pred = pd.melt(df_pred, id_vars=['dates'], value_vars=stations, var_name="id", value_name="prediction")
-        # df_real = pd.DataFrame(real_data, columns=stations, index=dates)
-        # df_real["dates"] = dates
-        # df_real = pd.melt(df_real, id_vars=['dates'], value_vars=stations, var_name="id", value_name="y")
-
-        # df_merge = df_pred.merge(df_real, left_on=['dates', 'id'], right_on=['dates', 'id'])
-        # df_merge.to_csv(f'{args.save}_predictions.csv', index=False)
-
         metrics = util.metric(pred,real)
         log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
         print(log.format(args.single_prediction_time_step, metrics[0], metrics[1], metrics[2]))
@@ -287,25 +287,15 @@ def main():
         amape.append(metrics[1])
         armse.append(metrics[2])
 
+        log = 'For horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
+        print(log.format(args.single_prediction_time_step, np.mean(amae), np.mean(amape), np.mean(armse)))
+    
     else:
             
         for i in range(args.from_seq_length,args.seq_length):
             
-            pred = scaler.inverse_transform(yhat) if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])
+            pred = scaler.inverse_transform(yhat[:,:,i]) # if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])
             real = realy[:,:,i]
-            # pred_data = pred if args.device == 'cpu' else pred.cpu().numpy()
-            # real_data = real if args.device == 'cpu' else real.cpu().numpy()
-    
-            # df_pred = pd.DataFrame(pred_data, columns=stations)
-            # df_pred["dates"] = dates
-            # df_pred = pd.melt(df_pred, id_vars=['dates'], value_vars=stations, var_name="id", value_name="prediction")
-            # df_real = pd.DataFrame(real_data, columns=stations, index=dates)
-            # df_real["dates"] = dates
-            # df_real = pd.melt(df_real, id_vars=['dates'], value_vars=stations, var_name="id", value_name="y")
-    
-            # df_merge = df_pred.merge(df_real, left_on=['dates', 'id'], right_on=['dates', 'id'])
-            # df_merge.to_csv(f'{args.save}_predictions.csv', index=False)
-    
             metrics = util.metric(pred,real)
             log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
             print(log.format(i+1, metrics[0], metrics[1], metrics[2]))
@@ -313,11 +303,9 @@ def main():
             amape.append(metrics[1])
             armse.append(metrics[2])
 
+        log = 'On average over {:d} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
+        print(args.seq_length, log.format(np.mean(amae), np.mean(amape), np.mean(armse)))    
     
-    if args.prediction_multi_or_single=='multi':
-        log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-        print(log.format(args.seq_length, np.mean(amae),np.mean(amape),np.mean(armse)))        
-
     
     path_name = args.save+"_exp"+str(args.expid)+"_best_"+str(round(his_loss[bestid],2))+".pth"
     
