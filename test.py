@@ -62,8 +62,11 @@ def main():
     scaler = dataloader['scaler']
     outputs = []
     realy = torch.Tensor(dataloader['y_test']).to(device)
-    realy = realy.transpose(1,3)[:,0,:,:]
+    realy = realy.transpose(1, 3)
 
+    if args.prediction_multi_or_single == 'single':
+        realy = realy[:, 0, :, args.single_prediction_time_step - 1]  # Select single horizon
+    
     for iter, (x, y, _, _)  in enumerate(dataloader['test_loader'].get_iterator()):
         testx = torch.Tensor(x).to(device)
         testx = testx.transpose(1,3)
@@ -80,39 +83,29 @@ def main():
     armse = []
 
 
-    if args.prediction_multi_or_single=='single':
-        i=args.seq_length-1    
-
-        # pred = scaler.inverse_transform(yhat[:,:,i])
-        pred = scaler.inverse_transform(yhat) if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])        
-        real = realy[:,:,i]
-        metrics = util.metric(pred,real)
+    if args.prediction_multi_or_single == 'single':
+        pred = scaler.inverse_transform(yhat[:, :, args.single_prediction_time_step - 1])
+        metrics = util.metric(pred, realy)
         log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
         print(log.format(args.single_prediction_time_step, metrics[0], metrics[1], metrics[2]))
         amae.append(metrics[0])
         amape.append(metrics[1])
-        armse.append(metrics[2])    
+        armse.append(metrics[2]) 
 
     else:
-        
-        for i in range(args.from_seq_length,args.seq_length):
-    
-            # pred = scaler.inverse_transform(yhat[:,:,i])
-            pred = scaler.inverse_transform(yhat) if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])        
-
-            real = realy[:,:,i]
-            metrics = util.metric(pred,real)
+        for i in range(args.from_seq_length, args.seq_length):
+            pred = scaler.inverse_transform(yhat[:, :, i])
+            real = realy[:, :, i]
+            metrics = util.metric(pred, real)
             log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-            print(log.format(i+1, metrics[0], metrics[1], metrics[2]))
+            print(log.format(i + 1, metrics[0], metrics[1], metrics[2]))
             amae.append(metrics[0])
             amape.append(metrics[1])
             armse.append(metrics[2])
 
-
-    if args.prediction_multi_or_single=='multi':
-    
         log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-        print(log.format(args.seq_length,np.mean(amae),np.mean(amape),np.mean(armse)))
+        print(log.format(args.seq_length, np.mean(amae), np.mean(amape), np.mean(armse)))
+
     
     if args.addaptadj == True:
         addaptadj_text = "Adapt"
@@ -131,59 +124,42 @@ def main():
         df = pd.DataFrame(adp)
         sns.heatmap(df, cmap="RdYlBu")
         plt.savefig("./heatmap" + "_" + variant + "_" + addaptadj_text + '.pdf')
-        
+
+    # Saving predictions and results
+    save_predictions(realy, yhat, scaler, args, variant, addaptadj_text)
+
     
+def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
     y_real = np.array([])
     y_hat = np.array([])
     sensor_id = np.array([])
     temporal_horizon = np.array([])
 
-
-    if args.seq_length==1:
-
-        j = args.seq_length-1
-        
-        y_hat = np.append(y_hat , scaler.inverse_transform(yhat).cpu().detach().numpy() )
-
+    if args.prediction_multi_or_single == 'single':
+        y_hat = np.append(y_hat, scaler.inverse_transform(yhat).cpu().detach().numpy())
         for i in range(args.yrealy):
-            
-            y_real = np.append(y_real , realy[:, i , args.single_prediction_time_step ].cpu().detach().numpy() ) 
-            y_seq_length = np.repeat( args.single_prediction_time_step , args.ytest_size) #timesteps test dataset
-            temporal_horizon = np.append(temporal_horizon , y_seq_length)
+            y_real = np.append(y_real, realy[:, i].cpu().detach().numpy())
+            y_seq_length = np.repeat(args.single_prediction_time_step, args.ytest_size)
+            temporal_horizon = np.append(temporal_horizon, y_seq_length)
+            sensor_yrealy = np.repeat(i + 1, args.ytest_size)
+            sensor_id = np.append(sensor_id, sensor_yrealy)
 
-            sensor_yrealy = np.repeat( i+1 , args.ytest_size * args.seq_length)
-            sensor_id = np.append(sensor_id , sensor_yrealy)
-    
     else:
-
         for i in range(args.yrealy):
-            
             for j in range(args.seq_length):
-    
-                y_real = np.append(y_real , realy[:, i , j ].cpu().detach().numpy() ) # i = sensorID , j = temporal horizon
-                y_hat = np.append(y_hat , scaler.inverse_transform(yhat[:, i , j ]).cpu().detach().numpy() )
-                y_seq_length = np.repeat( j+1 , args.ytest_size) #timesteps test dataset
-                temporal_horizon = np.append(temporal_horizon , y_seq_length)        
+                y_real = np.append(y_real, realy[:, i, j].cpu().detach().numpy())
+                y_hat = np.append(y_hat, scaler.inverse_transform(yhat[:, i, j]).cpu().detach().numpy())
+                y_seq_length = np.repeat(j + 1, args.ytest_size)
+                temporal_horizon = np.append(temporal_horizon, y_seq_length)
+            sensor_yrealy = np.repeat(i + 1, args.ytest_size * args.seq_length)
+            sensor_id = np.append(sensor_id, sensor_yrealy)
 
-            sensor_yrealy = np.repeat( i+1 , args.ytest_size * args.seq_length)
-            sensor_id = np.append(sensor_id , sensor_yrealy)
-        
-    timesteps = np.tile(np.tile(np.arange(args.ytest_size)+1,args.seq_length) ,args.yrealy)
-    
+    timesteps = np.tile(np.tile(np.arange(args.ytest_size) + 1, args.seq_length), args.yrealy)
 
-    print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {sensor_yrealy.shape[0]} rows per sensor (timesteps * horizons) , {sensor_id.shape[0]} repeated sensors')    
-    
-    df2 = pd.DataFrame({'sensor id': sensor_id,'temporal horizon': temporal_horizon,'timesteps':timesteps, 'real_values': y_real, 'pred_values': y_hat})
-    df2.to_csv('./predictions' + '_' + variant + "_" + addaptadj_text + '.csv',index=False)
+    print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {sensor_yrealy.shape[0]} rows per sensor (timesteps * horizons) , {sensor_id.shape[0]} repeated sensors')
 
-###     y12 = realy[:,args.yrealy,11].cpu().detach().numpy()
-###     yhat12 = scaler.inverse_transform(yhat[:,args.yrealy,11]).cpu().detach().numpy()
-
-###     y1 = realy[:,args.yrealy,0].cpu().detach().numpy()
-###     yhat1 = scaler.inverse_transform(yhat[:,args.yrealy,0]).cpu().detach().numpy()
-
-###     df2 = pd.DataFrame({'real1': y1, 'pred1':yhat1 })
-
+    df2 = pd.DataFrame({'sensor id': sensor_id, 'temporal horizon': temporal_horizon, 'timesteps': timesteps, 'real_values': y_real, 'pred_values': y_hat})
+    df2.to_csv(f'./predictions_{variant}_{addaptadj_text}.csv', index=False)
 
 
 
