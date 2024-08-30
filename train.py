@@ -187,7 +187,6 @@ def main():
 
         print()
         print()
-        print(f"Prediction type: {args.prediction_multi_or_single} , Shape of trainx: {trainx.shape}, Shape of trainy: {trainy.shape}")
         print("Average Training Time: {:.4f} secs/epoch".format(np.mean(train_time)))
         print("Average Inference Time: {:.4f} secs".format(np.mean(val_time)))
         print() 
@@ -264,7 +263,13 @@ def main():
 
 
     # Print the shape of x and y to ensure they're being loaded
+    print()
+    print()
+    print(f"Prediction type: {args.prediction_multi_or_single} , Shape of trainx: {trainx.shape}, Shape of trainy: {trainy.shape}")
+    print()    
     print(f"Shape of x: {x.shape}, Shape of y: {y.shape}, Shape of outputs: {len(outputs)}")   
+    print()
+    print()
     
     yhat = torch.cat(outputs,dim=0)
     yhat = yhat[:realy.size(0),...]
