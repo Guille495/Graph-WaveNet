@@ -284,7 +284,7 @@ def main():
 
         pred = scaler.inverse_transform(yhat)
         print()
-        print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}")
+        print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}, Shape of realy squeezed: {realy.squeeze(-1).shape}")
         print()
         metrics = util.metric(pred, realy.squeeze(-1)) # Squeeze the last dimension from realy to match the shape of pred
         print("Squeeze the last dimension from realy to match the shape of pred")
