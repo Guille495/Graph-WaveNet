@@ -111,16 +111,11 @@ def main():
                     trainy = trainy[:,:,:, args.single_prediction_time_step-1].unsqueeze(-1)
                     metrics = engine.train(trainx, trainy)
 
-                    print(f"Prediction type --single-- , Shape of trainx: {trainx.shape}, Shape of trainy: {trainy.shape}")   
-
-                
-
                 else:
                     # If using multiple horizons, trainy still has 4 dimensions
                     metrics = engine.train(trainx, trainy[:, 0, :, :])
 
-                    print(f"Prediction type --multi-- , Shape of trainx: {trainx.shape}, Shape of trainy: {trainy.shape}")
-                
+
                 train_loss.append(metrics[0])
                 total_train_rmse.append(metrics[2])
                 total_train_loss.append(metrics[0])
@@ -135,6 +130,8 @@ def main():
             valid_loss = []
             valid_mape = []
             valid_rmse = []
+
+        print(f"Prediction type: {args.prediction_multi_or_single} , Shape of trainx: {trainx.shape}, Shape of trainy: {trainy.shape}")
 
 
             s1 = time.time()
