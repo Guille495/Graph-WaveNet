@@ -131,9 +131,7 @@ def main():
             valid_mape = []
             valid_rmse = []
 
-        print(f"Prediction type: {args.prediction_multi_or_single} , Shape of trainx: {trainx.shape}, Shape of trainy: {trainy.shape}")
-
-
+        
             s1 = time.time()
             for iter, (x, y, _, _) in enumerate(dataloader['val_loader'].get_iterator()):
                 testx = torch.Tensor(x).to(device)
@@ -187,6 +185,8 @@ def main():
             print(log.format(i, mtrain_loss, mtrain_mape, mtrain_rmse, mvalid_loss, mvalid_mape, mvalid_rmse, (t2 - t1)),flush=True)
             torch.save(engine.model.state_dict(), args.save+"_epoch_"+str(i)+"_"+str(round(mvalid_loss,2))+".pth")
 
+        
+        print(f"Prediction type: {args.prediction_multi_or_single} , Shape of trainx: {trainx.shape}, Shape of trainy: {trainy.shape}")
         print("Average Training Time: {:.4f} secs/epoch".format(np.mean(train_time)))
         print("Average Inference Time: {:.4f} secs".format(np.mean(val_time)))
 
