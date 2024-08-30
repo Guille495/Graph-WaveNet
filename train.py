@@ -109,8 +109,12 @@ def main():
                 if args.prediction_multi_or_single=="single":
                     # select specified temporal horizon
                     trainy = trainy[:,:,:, args.single_prediction_time_step-1]
+                    metrics = engine.train(trainx, trainy)
+
+                else:
+                    # If using multiple horizons, trainy still has 4 dimensions
+                    metrics = engine.train(trainx, trainy[:, 0, :, :])
                 
-                metrics = engine.train(trainx, trainy[:,0,:,:])
                 train_loss.append(metrics[0])
                 total_train_rmse.append(metrics[2])
                 total_train_loss.append(metrics[0])
@@ -137,10 +141,11 @@ def main():
                 if args.prediction_multi_or_single=="single":
                     # select specified temporal horizon 
                     testy = testy[:,:,:,args.single_prediction_time_step - 1]
+                    metrics = engine.eval(testx, testy)
+
+                else:
+                    metrics = engine.eval(testx, testy[:,0,:,:]) 
                     
-                metrics = engine.eval(testx, testy[:,0,:,:])
-                # preds = engine.model(testx).transpose(1,3)
-                # val_outputs.append(preds.squeeze())
                 valid_loss.append(metrics[0])
                 total_val_loss.append(metrics[0])
                 total_val_rmse.append(metrics[2])
@@ -276,11 +281,8 @@ def main():
     armse = []
 
     if args.prediction_multi_or_single=='single':
-        i=args.single_prediction_time_step-1
-        
-        pred = scaler.inverse_transform(yhat[:,:,i]) # if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])
-        real = realy[:,:,i]
-        metrics = util.metric(pred,real)
+        pred = scaler.inverse_transform(yhat)
+        metrics = util.metric(pred,realy)
         log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
         print(log.format(args.single_prediction_time_step, metrics[0], metrics[1], metrics[2]))
         amae.append(metrics[0])
@@ -315,6 +317,20 @@ def main():
         torch.save(engine.model.state_dict(), args.save+"_exp"+str(args.expid)+"_best.pth")
 
     return path_name
+
+def save_metrics(train_loss, mean_val_loss, val_loss, train_rmse, mean_val_rmse, val_rmse):
+    os.makedirs("./garage", exist_ok=True)
+    save_to_file("./garage/train_loss.txt", train_loss)
+    save_to_file("./garage/mean_val_loss.txt", mean_val_loss)
+    save_to_file("./garage/val_loss.txt", val_loss)
+    save_to_file("./garage/train_rmse.txt", train_rmse)
+    save_to_file("./garage/mean_val_rmse.txt", mean_val_rmse)
+    save_to_file("./garage/val_rmse.txt", val_rmse)
+
+def save_to_file(filename, data):
+    with open(filename, "w") as f:
+        for element in data:
+            f.write(str(element) + "\n")
 
 if __name__ == "__main__":
 
