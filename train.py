@@ -303,8 +303,8 @@ def main():
             amape.append(metrics[1])
             armse.append(metrics[2])
 
-        log = 'On average over {:d} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-        print(args.seq_length, log.format(np.mean(amae), np.mean(amape), np.mean(armse)))    
+        log = 'On average over {:.4f} horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
+        print(log.format(args.seq_length, np.mean(amae),np.mean(amape),np.mean(armse)))     
     
     
     path_name = args.save+"_exp"+str(args.expid)+"_best_"+str(round(his_loss[bestid],2))+".pth"
