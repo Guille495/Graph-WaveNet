@@ -281,7 +281,11 @@ def main():
     armse = []
 
     if args.prediction_multi_or_single=='single':
+
         pred = scaler.inverse_transform(yhat)
+
+        print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}")
+
         metrics = util.metric(pred,realy)
         log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
         print(log.format(args.single_prediction_time_step, metrics[0], metrics[1], metrics[2]))
