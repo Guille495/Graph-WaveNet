@@ -62,7 +62,7 @@ def main():
     scaler = dataloader['scaler']
     outputs = []
     realy = torch.Tensor(dataloader['y_test']).to(device)
-    realy = realy.transpose(1, 3)
+    realy = realy.transpose(1, 3)[:,0,:,:]
 
     # if args.prediction_multi_or_single == 'single':
     #     realy = realy[:, 0, :, args.single_prediction_time_step - 1]  # Select single horizon
