@@ -284,10 +284,10 @@ def main():
 
         pred = scaler.inverse_transform(yhat)
         print()
-        print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}, Shape of realy squeezed: {realy.squeeze(-1).shape}")
+        print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}, Shape of realy sliced to relevant temporal horizon only: {realy[:,:,args.single_prediction_time_step].shape}")
         print()
-        metrics = util.metric(pred, realy.squeeze(-1)) # Squeeze the last dimension from realy to match the shape of pred
-        print("Squeeze the last dimension from realy to match the shape of pred")
+        metrics = util.metric(pred, realy[:,:,args.single_prediction_time_step]) # Consider only the relevant temporal horizon 
+        print("Keep only the desired temporal horizon in realy to match the shape of pred")
         print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}")
         log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
         print(log.format(args.single_prediction_time_step, metrics[0], metrics[1], metrics[2]))
