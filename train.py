@@ -254,18 +254,18 @@ def main():
 
         with torch.no_grad():
             preds = engine.model(testx).transpose(1,3)
-        outputs.append(preds.squeeze())
+        outputs.append(preds.squeeze())    
 
 
     # Print the shape of x and y to ensure they're being loaded
-    print(f"Shape of x: {x.shape}, Shape of y: {y.shape}, Shape of outputs: {outputs.shape}")   
+    print(f"Shape of x: {x.shape}, Shape of y: {y.shape}, Shape of outputs: {len(outputs)}")   
     
     yhat = torch.cat(outputs,dim=0)
     yhat = yhat[:realy.size(0),...]
 
-    if args.prediction_multi_or_single=="single":
-        yhat = yhat[:, :, args.single_prediction_time_step - 1]
-        realy = realy[:, :, args.single_prediction_time_step - 1]
+    # if args.prediction_multi_or_single=="single":
+    #     yhat = yhat[:, :, args.single_prediction_time_step - 1]
+    #     realy = realy[:, :, args.single_prediction_time_step - 1]
 
     print("Training finished")
 
