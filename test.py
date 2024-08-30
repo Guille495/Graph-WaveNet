@@ -64,8 +64,8 @@ def main():
     realy = torch.Tensor(dataloader['y_test']).to(device)
     realy = realy.transpose(1, 3)
 
-    if args.prediction_multi_or_single == 'single':
-        realy = realy[:, 0, :, args.single_prediction_time_step - 1]  # Select single horizon
+    # if args.prediction_multi_or_single == 'single':
+    #     realy = realy[:, 0, :, args.single_prediction_time_step - 1]  # Select single horizon
     
     for iter, (x, y, _, _)  in enumerate(dataloader['test_loader'].get_iterator()):
         testx = torch.Tensor(x).to(device)
