@@ -301,13 +301,13 @@ def main():
         print("Keep only the desired temporal horizon in realy to match the shape of pred")
         print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}")
         log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-        print(log.format(args.single_prediction_time_step - 1, metrics[0], metrics[1], metrics[2]))
+        print(log.format(args.single_prediction_time_step, metrics[0], metrics[1], metrics[2]))
         amae.append(metrics[0])
         amape.append(metrics[1])
         armse.append(metrics[2])
 
         log = 'For horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
-        print(log.format(args.single_prediction_time_step - 1, np.mean(amae), np.mean(amape), np.mean(armse)))
+        print(log.format(args.single_prediction_time_step, np.mean(amae), np.mean(amape), np.mean(armse)))
     
     else:
             
