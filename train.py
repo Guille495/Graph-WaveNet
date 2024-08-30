@@ -108,7 +108,7 @@ def main():
 
                 if args.prediction_multi_or_single=="single":
                     # select specified temporal horizon
-                    trainy = trainy[:,:,:, args.single_prediction_time_step-1]
+                    trainy = trainy[:,:,:, args.single_prediction_time_step-1].unsqueeze(-1)
                     metrics = engine.train(trainx, trainy)
 
                 else:
@@ -140,7 +140,7 @@ def main():
 
                 if args.prediction_multi_or_single=="single":
                     # select specified temporal horizon 
-                    testy = testy[:,:,:,args.single_prediction_time_step - 1]
+                    testy = testy[:,:,:,args.single_prediction_time_step - 1].unsqueeze(-1)
                     metrics = engine.eval(testx, testy)
 
                 else:
