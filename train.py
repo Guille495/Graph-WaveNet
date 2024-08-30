@@ -283,10 +283,12 @@ def main():
     if args.prediction_multi_or_single=='single':
 
         pred = scaler.inverse_transform(yhat)
-
+        print()
         print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}")
-
-        metrics = util.metric(pred,realy)
+        print()
+        metrics = util.metric(pred, realy.squeeze(-1)) # Squeeze the last dimension from realy to match the shape of pred
+        print("Squeeze the last dimension from realy to match the shape of pred")
+        print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}")
         log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
         print(log.format(args.single_prediction_time_step, metrics[0], metrics[1], metrics[2]))
         amae.append(metrics[0])
