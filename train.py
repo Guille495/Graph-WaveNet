@@ -109,7 +109,7 @@ def main():
                 if args.prediction_multi_or_single=="single":
                     # select specified temporal horizon
                     trainy = trainy[:,:,:, args.single_prediction_time_step-1].unsqueeze(-1)
-                    metrics = engine.train(trainx, trainy)
+                    metrics = engine.train(trainx, trainy[:, 0, :, :])
 
                 else:
                     # If using multiple horizons, trainy still has 4 dimensions
@@ -142,7 +142,7 @@ def main():
                 if args.prediction_multi_or_single=="single":
                     # select specified temporal horizon 
                     testy = testy[:,:,:,args.single_prediction_time_step - 1].unsqueeze(-1)
-                    metrics = engine.eval(testx, testy)
+                    metrics = engine.eval(testx, testy[:,0,:,:])
 
                 else:
                     metrics = engine.eval(testx, testy[:,0,:,:]) 
