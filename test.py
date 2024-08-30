@@ -127,7 +127,7 @@ def main():
         plt.savefig("./heatmap" + "_" + variant + "_" + addaptadj_text + '.pdf')
 
     # Saving predictions and results
-#    save_predictions(realy, yhat, scaler, args, variant, addaptadj_text)
+   save_predictions(realy, yhat, scaler, args, variant, addaptadj_text)
 
     
 def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
