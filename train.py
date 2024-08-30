@@ -258,7 +258,7 @@ def main():
 
 
     # Print the shape of x and y to ensure they're being loaded
-    print(f"Shape of x: {x.shape}, Shape of y: {y.shape}")    
+    print(f"Shape of x: {x.shape}, Shape of y: {y.shape}, Shape of outputs: {outputs.shape}")   
     
     yhat = torch.cat(outputs,dim=0)
     yhat = yhat[:realy.size(0),...]
