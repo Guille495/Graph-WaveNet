@@ -158,8 +158,12 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
 
     timesteps = np.tile(np.tile(np.arange(args.ytest_size) + 1, args.seq_length), args.yrealy)
 
+    print()
+    print()
     print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {sensor_yrealy.shape[0]} rows per sensor (timesteps * horizons) , {sensor_id.shape[0]} repeated sensors')
-
+    print()
+    print()
+    
     df2 = pd.DataFrame({'sensor id': sensor_id, 'temporal horizon': temporal_horizon, 'timesteps': timesteps, 'real_values': y_real, 'pred_values': y_hat})
     df2.to_csv(f'./predictions_{variant}_{addaptadj_text}.csv', index=False)
 
