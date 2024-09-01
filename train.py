@@ -301,7 +301,7 @@ def main():
     else:
 
         
-        if args.seq_length:
+        if args.seq_length==1:
             end_range = 1
         else:
             end_range = args.seq_length
