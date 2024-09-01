@@ -294,6 +294,7 @@ def main():
     print()
     print(f'trainX: {trainx.shape}, trainY: {trainy.shape}')
     print(f'valX: {testx.shape}, valY: {testy.shape}')    
+    print(f'Outputs: {outputs.shape}')
     print(f'yhat: {yhat.shape}')
     print()
     
