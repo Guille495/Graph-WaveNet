@@ -252,8 +252,6 @@ def main():
 
     for iter, (x, y, _, _) in enumerate(dataloader['test_loader'].get_iterator()):
 
-        ### print(f"Number of batches in test dataloader: {len(dataloader['test_loader'])}")
-
         testx = torch.Tensor(x).to(device)
         testx = testx.transpose(1,3)
 
@@ -264,39 +262,23 @@ def main():
 
     # Print the shape of x and y to ensure they're being loaded
     print()
-    print()
     print(f"Prediction type: {args.prediction_multi_or_single} , Shape of trainx: {trainx.shape}, Shape of trainy: {trainy.shape}")
     print()    
-    print(f"Shape of x: {x.shape}, Shape of y: {y.shape}, Shape of outputs: {len(outputs)}")   
-    print()
-    print()
     
     yhat = torch.cat(outputs,dim=0)
     yhat = yhat[:realy.size(0),...]
 
-    # if args.prediction_multi_or_single=="single":
-    #     yhat = yhat[:, :, args.single_prediction_time_step - 1]
-    #     realy = realy[:, :, args.single_prediction_time_step - 1]
-
     print("Training finished")
 
+    
     if (not args.no_train):
         print("The valid loss on best model is", str(round(total_mean_val_loss[bestid],4)))
 
-    # result_metrics = pd.DataFrame(columns=["date", "id", "y", "prediction"])
-    # dates = np.squeeze(dates, axis=1)
-    # result_metrics["date"] = dates
-
+    
     amae = []
     amape = []
     armse = []
 
-    print()
-    print(f'trainX: {trainx.shape}, trainY: {trainy.shape}')
-    print(f'valX: {testx.shape}, valY: {testy.shape}')    
-    print(f'Outputs: {outputs.shape}')
-    print(f'yhat: {yhat.shape}')
-    print()
     
     if args.prediction_multi_or_single=='single':
 
@@ -320,8 +302,8 @@ def main():
             
         for i in range(args.from_seq_length,args.seq_length):
             
-            pred = scaler.inverse_transform(yhat[:,:,i]) # if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i])
-            real = realy[:,:,i]
+            pred = scaler.inverse_transform(yhat[:,:,i]) if args.seq_length == 1 else scaler.inverse_transform(yhat[:,:,i]).unsqueeze(-1)
+            real = realy[:,:,i] if args.seq_length == 1 else realy[:,:,i].unsqueeze(-1)
             metrics = util.metric(pred,real)
             log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
             print(log.format(i+1, metrics[0], metrics[1], metrics[2]))
