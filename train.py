@@ -291,6 +291,10 @@ def main():
     amape = []
     armse = []
 
+    print()
+    print(f'yhat: {yhat.size})
+    print()
+    
     if args.prediction_multi_or_single=='single':
 
         pred = scaler.inverse_transform(yhat)
