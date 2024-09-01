@@ -292,6 +292,8 @@ def main():
     armse = []
 
     print()
+    print(f'trainX: {trainx.shape}, trainY: {trainy.shape}')
+    print(f'valX: {testx.shape}, valY: {testy.shape}')    
     print(f'yhat: {yhat.shape}')
     print()
     
