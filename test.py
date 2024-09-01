@@ -77,9 +77,9 @@ def main():
     yhat = torch.cat(outputs,dim=0)
     yhat = yhat[:realy.size(0),...]
 
-
-    print(f'yhat shape: {yhat.size}')
-
+    print()
+    print(f'yhat shape: {yhat.shape}')
+    print()
     
     amae = []
     amape = []
