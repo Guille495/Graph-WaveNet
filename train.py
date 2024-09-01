@@ -299,8 +299,14 @@ def main():
         print(log.format(args.single_prediction_time_step, np.mean(amae), np.mean(amape), np.mean(armse)))
     
     else:
+
+        
+        if args.seq_length:
+            end_range = 1
+        else:
+            end_range = args.seq_length
             
-        for i in range(args.from_seq_length,args.seq_length):
+        for i in range(args.from_seq_length,end_range):
 
             pred = scaler.inverse_transform(yhat[:,:,i])
             real = realy[:,:,i]
