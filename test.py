@@ -132,29 +132,35 @@ def main():
 
     
 def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
+
+    # realy = [num_samples , num_nodes , output_length]            (collapsed from [num_samples , output_dim , num_nodes , output_length])
+    # yhat = 
+    
     y_real = np.array([])
     y_hat = np.array([])
     sensor_id = np.array([])
     temporal_horizon = np.array([])
 
     if args.prediction_multi_or_single == 'single':
-        y_hat = np.append(y_hat, scaler.inverse_transform(yhat).cpu().detach().numpy())
-        for i in range(args.yrealy):
-            y_real = np.append(y_real, realy[:, i].cpu().detach().numpy())
+        
+        for sensor_id in range(args.yrealy):
+            
+            y_real = np.append(y_real, realy[:, sensor_id + 1, args.single_prediction_time_step - 1].cpu().detach().numpy())
+            y_hat = np.append(y_hat, scaler.inverse_transform(yhat[: , sensor_id + 1, args.single_prediction_time_step - 1]).cpu().detach().numpy())
             y_seq_length = np.repeat(args.single_prediction_time_step, args.ytest_size)
-            temporal_horizon = np.append(temporal_horizon, y_seq_length)
-            sensor_yrealy = np.repeat(i + 1, args.ytest_size)
-            sensor_id = np.append(sensor_id, sensor_yrealy)
+            temporal_horizon = np.append(args.single_prediction_time_step, y_seq_length)
+            sensor_yrealy = np.repeat(sensor_id + 1, args.ytest_size)
+            sensor_id = np.append(sensor_id + 1, sensor_yrealy)
 
     else:
-        for i in range(args.yrealy):
-            for j in range(args.seq_length):
-                y_real = np.append(y_real, realy[:, i, j].cpu().detach().numpy())
-                y_hat = np.append(y_hat, scaler.inverse_transform(yhat[:, i, j]).cpu().detach().numpy())
-                y_seq_length = np.repeat(j + 1, args.ytest_size)
+        for sensor_id in range(args.yrealy):
+            for time_horizon in range(args.seq_length):
+                y_real = np.append(y_real, realy[:, sensor_id + 1, time_horizon + 1].cpu().detach().numpy())
+                y_hat = np.append(y_hat, scaler.inverse_transform(yhat[:, sensor_id + 1, time_horizon + 1]).cpu().detach().numpy())
+                y_seq_length = np.repeat(time_horizon + 1, args.ytest_size)
                 temporal_horizon = np.append(temporal_horizon, y_seq_length)
-            sensor_yrealy = np.repeat(i + 1, args.ytest_size * args.seq_length)
-            sensor_id = np.append(sensor_id, sensor_yrealy)
+            sensor_yrealy = np.repeat(sensor_id + 1, args.ytest_size * args.seq_length)
+            sensor_id = np.append(sensor_id + 1, sensor_yrealy)
 
     timesteps = np.tile(np.tile(np.arange(args.ytest_size) + 1, args.seq_length), args.yrealy)
 
