@@ -78,6 +78,9 @@ def main():
     yhat = yhat[:realy.size(0),...]
 
 
+    print(f'yhat shape: {yhat.size}')
+
+    
     amae = []
     amape = []
     armse = []
