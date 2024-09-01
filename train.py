@@ -292,7 +292,7 @@ def main():
     armse = []
 
     print()
-    print(f'yhat: {yhat.size}')
+    print(f'yhat: {yhat.shape}')
     print()
     
     if args.prediction_multi_or_single=='single':
