@@ -148,8 +148,8 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
         
         for sensor_id in range(args.yrealy):
             
-            y_real = np.append(y_real, realy[:, sensor_id + 1, args.single_prediction_time_step - 1].cpu().detach().numpy())
-            y_hat = np.append(y_hat, scaler.inverse_transform(yhat[: , sensor_id + 1, args.single_prediction_time_step - 1]).cpu().detach().numpy())
+            y_real = np.append(y_real, realy[:, sensor_id, args.single_prediction_time_step - 1].cpu().detach().numpy())
+            y_hat = np.append(y_hat, scaler.inverse_transform(yhat[: , sensor_id]).cpu().detach().numpy())
             y_seq_length = np.repeat(args.single_prediction_time_step, args.ytest_size)
             temporal_horizon = np.append(args.single_prediction_time_step, y_seq_length)
             sensor_yrealy = np.repeat(sensor_id + 1, args.ytest_size)
