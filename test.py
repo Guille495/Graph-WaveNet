@@ -142,7 +142,7 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
     
     y_real = np.array([])
     y_hat = np.array([])
-    sensor_id = np.array([])
+    sensors = np.array([])
     temporal_horizon = np.array([])
 
     if args.prediction_multi_or_single == 'single':
@@ -153,9 +153,12 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
             y_hat = np.append(y_hat, scaler.inverse_transform(yhat[: , sensor_id]).cpu().detach().numpy())
             y_seq_length = np.repeat(args.single_prediction_time_step, args.ytest_size)
 
-        temporal_horizon = np.repeat(args.single_prediction_time_step, args.ytest_size * args.num_nodes)[:len(y_real)]
-        sensor_id = np.repeat(sensor_id + 1, args.ytest_size * args.num_nodes)[:len(y_real)]
-        timesteps = np.repeat(np.arange(args.ytest_size),args.num_nodes)[:len(y_real)]
+            sensors = np.repeat(sensor_id + 1, args.ytest_size)
+
+        
+        timesteps = np.repeat(np.arange(args.ytest_size) + 1, args.num_nodes)[:len(y_real)]
+        sensors = sensors[:len(y_real)] # in case of extra row
+        temporal_horizon = np.repeat(args.single_prediction_time_step, args.ytest_size * args.num_nodes)[:len(y_real)] # same for entire dataframe
 
     else:
         for sensor_id in range(args.yrealy):
@@ -165,10 +168,10 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
                 y_seq_length = np.repeat(time_horizon + 1, args.ytest_size)
                 temporal_horizon = np.append(temporal_horizon, np.repeat(time_horizon + 1, args.ytest_size))
                 
-            sensor_id = np.repeat(sensor_id + 1, args.ytest_size * args.num_nodes)
+            sensors = np.repeat(sensor_id + 1, args.ytest_size * args.num_nodes)
             timesteps = np.tile(np.tile(np.arange(args.ytest_size) + 1, args.seq_length), args.yrealy)
 
-        sensor_id = sensor_id[:len(y_real)]
+        sensors = sensor_id[:len(y_real)]
         timesteps = timesteps[:len(y_real)]
 
     print()
