@@ -154,7 +154,7 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
 
         temporal_horizon = np.repeat(args.single_prediction_time_step, args.ytest_size * args.num_nodes)[:len(y_real)]
         sensor_id = np.repeat(sensor_id + 1, args.ytest_size * args.num_nodes)[:len(y_real)]
-        timesteps = np.arange(args.ytest_size)[:len(y_real)]
+        timesteps = np.repeat(np.arange(args.ytest_size),args.num_nodes)[:len(y_real)]
 
     else:
         for sensor_id in range(args.yrealy):
