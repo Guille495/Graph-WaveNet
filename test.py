@@ -152,7 +152,7 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
             y_hat = np.append(y_hat, scaler.inverse_transform(yhat[: , sensor_id]).cpu().detach().numpy())
             y_seq_length = np.repeat(args.single_prediction_time_step, args.ytest_size)
 
-        temporal_horizon = np.repeat(args.single_prediction_time_step, y_seq_length * args.num_nodes)[:len(y_real)]
+        temporal_horizon = np.repeat(args.single_prediction_time_step, y_seq_length * args.num_nodes)[: , :len(y_real)]
         sensor_id = np.repeat(sensor_id + 1, args.ytest_size * args.num_nodes)[:len(y_real)]
 
     else:
@@ -163,9 +163,8 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
                 y_seq_length = np.repeat(time_horizon + 1, args.ytest_size)
                 temporal_horizon = np.append(temporal_horizon, np.repeat(time_horizon + 1, args.ytest_size))
                 
-            sensor_id = np.repeat(sensor_id + 1, args.ytest_size * args.num_nodes)[:len(y_real)]
-
-    timesteps = np.tile(np.tile(np.arange(args.ytest_size) + 1, args.seq_length), args.yrealy)
+        sensor_id = np.repeat(sensor_id + 1, args.ytest_size * args.num_nodes)[:len(y_real)]
+        timesteps = np.tile(np.tile(np.arange(args.ytest_size) + 1, args.seq_length), args.yrealy)[: , :len(y_real)]
 
     print()
     print()
