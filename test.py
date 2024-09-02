@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import math as m
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--device',type=str,default='cpu',help='')
@@ -152,9 +151,9 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
             y_real = np.append(y_real, realy[:, sensor_id, args.single_prediction_time_step - 1].cpu().detach().numpy())
             y_hat = np.append(y_hat, scaler.inverse_transform(yhat[: , sensor_id]).cpu().detach().numpy())
             y_seq_length = np.repeat(args.single_prediction_time_step, args.ytest_size)
-            temporal_horizon = np.repeat(args.single_prediction_time_step, m.floor(y_seq_length * args.num_nodes))
-            sensor_yrealy = np.repeat(sensor_id + 1, m.floor(args.ytest_size * args.num_nodes))
-            sensor_id = np.append(sensor_id + 1, sensor_yrealy)
+
+        temporal_horizon = np.repeat(args.single_prediction_time_step, y_seq_length * args.num_nodes)[:len(y_real)]
+        sensor_id = np.repeat(sensor_id + 1, args.ytest_size * args.num_nodes)[:len(y_real)]
 
     else:
         for sensor_id in range(args.yrealy):
@@ -162,15 +161,15 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
                 y_real = np.append(y_real, realy[:, sensor_id + 1, time_horizon + 1].cpu().detach().numpy())
                 y_hat = np.append(y_hat, scaler.inverse_transform(yhat[:, sensor_id + 1, time_horizon + 1]).cpu().detach().numpy())
                 y_seq_length = np.repeat(time_horizon + 1, args.ytest_size)
-                temporal_horizon = np.repeat(temporal_horizon, m.floor(y_seq_length * args.num_nodes))
-            sensor_yrealy = np.repeat(sensor_id + 1, m.floor(args.ytest_size * args.num_nodes))
-            sensor_id = np.append(sensor_id + 1, sensor_yrealy)
+                temporal_horizon = np.append(temporal_horizon, np.repeat(time_horizon + 1, args.ytest_size))
+                
+            sensor_id = np.repeat(sensor_id + 1, args.ytest_size * args.num_nodes)[:len(y_real)]
 
     timesteps = np.tile(np.tile(np.arange(args.ytest_size) + 1, args.seq_length), args.yrealy)
 
     print()
     print()
-    print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {sensor_yrealy.shape[0]} rows per sensor (timesteps * horizons) , {sensor_id.shape[0]} repeated sensors')
+    print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {len(sensor_id)} rows per sensor (timesteps * horizons) , {sensor_id.shape[0]} repeated sensors')
     print()
     print()
     print(f'Sensor_id: {sensor_id.size} , Temporal horizon: {temporal_horizon.size}, Timesteps: {timesteps.size}, Y real: {y_real.size}, Y hat: {y_hat.size}')
