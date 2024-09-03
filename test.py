@@ -184,7 +184,7 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
     print()
     print()
     
-    df2 = pd.DataFrame({'sensor id': sensor_id, 'temporal horizon': temporal_horizon, 'timesteps': timesteps, 'real_values': y_real, 'pred_values': y_hat})
+    df2 = pd.DataFrame({'sensor id': sensors, 'temporal horizon': temporal_horizon, 'timesteps': timesteps, 'real_values': y_real, 'pred_values': y_hat})
     df2.to_csv(f'./predictions_{variant}_{addaptadj_text}.csv', index=False)
 
 
