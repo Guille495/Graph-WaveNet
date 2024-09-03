@@ -154,7 +154,7 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
             y_hat = np.append(y_hat, scaler.inverse_transform(yhat[: , sensor_id]).cpu().detach().numpy())
             y_seq_length = np.repeat(args.single_prediction_time_step, args.ytest_size)
 
-            sensors = np.repeat(sensor_id + 1, args.ytest_size)
+            sensors = np.append(sensors, np.repeat(sensor_id + 1, args.ytest_size))
 
         
         timesteps = np.repeat(np.arange(args.ytest_size) + 1, args.num_nodes)[:len(y_real)]
