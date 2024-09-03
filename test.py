@@ -152,24 +152,22 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
             
             y_real = np.append(y_real, realy[:, sensor_id, args.single_prediction_time_step - 1].cpu().detach().numpy())
             y_hat = np.append(y_hat, scaler.inverse_transform(yhat[: , sensor_id]).cpu().detach().numpy())
-            y_seq_length = np.repeat(args.single_prediction_time_step, args.ytest_size)
-
+            y_seq_length = np.tile(args.single_prediction_time_step, args.ytest_size)
             sensors = np.append(sensors, np.repeat(sensor_id + 1, args.ytest_size))
-
         
-        timesteps = np.repeat(np.arange(args.ytest_size) + 1, args.num_nodes)[:len(y_real)]
+        timesteps = np.tile(np.arange(args.ytest_size) + 1, args.num_nodes)[:len(y_real)]
         sensors = sensors[:len(y_real)] # in case of extra row
-        temporal_horizon = np.repeat(args.single_prediction_time_step, args.ytest_size * args.num_nodes)[:len(y_real)] # same for entire dataframe
+        temporal_horizon = np.tile(args.single_prediction_time_step, args.ytest_size * args.num_nodes)[:len(y_real)] # same for entire dataframe
 
     else:
         for sensor_id in range(args.yrealy):
             for time_horizon in range(args.seq_length):
                 y_real = np.append(y_real, realy[:, sensor_id + 1, time_horizon + 1].cpu().detach().numpy())
                 y_hat = np.append(y_hat, scaler.inverse_transform(yhat[:, sensor_id + 1, time_horizon + 1]).cpu().detach().numpy())
-                y_seq_length = np.repeat(time_horizon + 1, args.ytest_size)
+                y_seq_length = np.tile(time_horizon + 1, args.ytest_size)
                 temporal_horizon = np.append(temporal_horizon, np.repeat(time_horizon + 1, args.ytest_size))
                 
-            sensors = np.repeat(sensor_id + 1, args.ytest_size * args.num_nodes)
+            sensors = np.tile(sensor_id + 1, args.ytest_size * args.num_nodes)
             timesteps = np.tile(np.tile(np.arange(args.ytest_size) + 1, args.seq_length), args.yrealy)
 
         sensors = sensors[:len(y_real)]
