@@ -144,6 +144,7 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
     y_hat = np.array([])
     sensors = np.array([])
     temporal_horizon = np.array([])
+    timesteps = []
 
     if args.prediction_multi_or_single == 'single':
         
@@ -171,12 +172,12 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
             sensors = np.repeat(sensor_id + 1, args.ytest_size * args.num_nodes)
             timesteps = np.tile(np.tile(np.arange(args.ytest_size) + 1, args.seq_length), args.yrealy)
 
-        sensors = sensor_id[:len(y_real)]
+        sensors = sensors[:len(y_real)]
         timesteps = timesteps[:len(y_real)]
 
     print()
     print()
-    print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {len(sensor_id)} rows per sensor (timesteps * horizons) , {sensor_id.shape[0]} repeated sensors')
+    print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {len(sensors)} rows per sensor (timesteps * horizons) , {sensors.shape[0]} repeated sensors')
     print()
     print()
     print(f'Sensor_id: {sensor_id.size} , Temporal horizon: {temporal_horizon.size}, Timesteps: {timesteps.size}, Y real: {y_real.size}, Y hat: {y_hat.size}')
