@@ -180,7 +180,7 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
     print(f'Shape is {y_real.shape[0]} real values , {y_hat.shape[0]} predictions , {y_seq_length.shape[0]} timesteps , {temporal_horizon.shape[0]} replicated timesteps , {len(sensors)} rows per sensor (timesteps * horizons) , {sensors.shape[0]} repeated sensors')
     print()
     print()
-    print(f'Sensor_id: {sensor_id.size} , Temporal horizon: {temporal_horizon.size}, Timesteps: {timesteps.size}, Y real: {y_real.size}, Y hat: {y_hat.size}')
+    print(f'Sensor_id: {sensors.size} , Temporal horizon: {temporal_horizon.size}, Timesteps: {timesteps.size}, Y real: {y_real.size}, Y hat: {y_hat.size}')
     print()
     print()
     
