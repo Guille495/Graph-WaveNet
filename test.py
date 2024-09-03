@@ -187,12 +187,6 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
     df2 = pd.DataFrame({'sensor id': sensor_id, 'temporal horizon': temporal_horizon, 'timesteps': timesteps, 'real_values': y_real, 'pred_values': y_hat})
     df2.to_csv(f'./predictions_{variant}_{addaptadj_text}.csv', index=False)
 
-    file_stats = os.stat(f'home/elasarga/predictions_{variant}_{addaptadj_text}.csv')
-    
-    print(f'df2 shape: {df2.shape}')
-    print(f'File Size in MegaBytes is {file_stats.st_size / (1024 * 1024)}')
-
-
 
 if __name__ == "__main__":
     main()
