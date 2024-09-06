@@ -183,7 +183,9 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
     print()
     
     df2 = pd.DataFrame({'sensor id': sensors, 'temporal horizon': temporal_horizon, 'timesteps': timesteps, 'real_values': y_real, 'pred_values': y_hat})
-    df2.to_csv(f'./predictions_{variant}_{addaptadj_text}_{args.prediction_multi_or_single}.csv', index=False)
+    df2.to_csv(f'./predictions_{variant}_{addaptadj_text}_{args.prediction_multi_or_single}_horizons_{args.seq_length}.csv', index=False)
+
+    print(f'df2 with shape {df2.shape} is succesfully printed')
 
 
 if __name__ == "__main__":
