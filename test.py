@@ -167,7 +167,7 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
                 y_seq_length = np.tile(time_horizon + 1, args.ytest_size)
                 temporal_horizon = np.append(temporal_horizon, np.tile(time_horizon + 1, args.ytest_size))
                 
-            sensors = np.tile(sensor_id + 1, args.ytest_size * args.num_nodes * args.seq_length)
+            sensors = np.append(sensors, np.repeat(sensor_id + 1, ytest_size))
             timesteps = np.tile(np.tile(np.arange(args.ytest_size) + 1, args.seq_length), args.yrealy)
 
         sensors = sensors[:len(y_real)]
@@ -183,6 +183,10 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
     print()
     
     df2 = pd.DataFrame({'sensor id': sensors, 'temporal horizon': temporal_horizon, 'timesteps': timesteps, 'real_values': y_real, 'pred_values': y_hat})
+
+    #TODO remove this slicing:
+    df2 = df2[:,:100001]
+    
     df2.to_csv(f'./predictions_{variant}_{addaptadj_text}_{args.prediction_multi_or_single}_horizons_{args.seq_length}.csv', index=False)
 
     print(f'df2 with shape {df2.shape} is succesfully printed')
