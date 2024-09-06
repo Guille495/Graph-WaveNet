@@ -167,7 +167,7 @@ def save_predictions(realy, yhat, scaler, args, variant, addaptadj_text):
                 y_seq_length = np.tile(time_horizon + 1, args.ytest_size)
                 temporal_horizon = np.append(temporal_horizon, np.tile(time_horizon + 1, args.ytest_size))
                 
-            sensors = np.append(sensors, np.repeat(sensor_id + 1, args.ytest_size))
+            sensors = np.append(sensors, np.repeat(sensor_id + 1, args.ytest_size * args.seq_length))
             timesteps = np.tile(np.tile(np.arange(args.ytest_size) + 1, args.seq_length), args.yrealy)
 
         sensors = sensors[:len(y_real)]
