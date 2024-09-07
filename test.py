@@ -88,9 +88,9 @@ def main():
 
 
     if args.prediction_multi_or_single == 'single':
-        pred = scaler.inverse_transform(yhat)
-        print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}, Shape of realy sliced to relevant temporal horizon only: {realy[:,:,args.single_prediction_time_step].shape}")
-        metrics = util.metric(pred, realy[:,:,args.single_prediction_time_step]) # Consider only the relevant temporal horizon 
+        pred = scaler.inverse_transform(yhat[:, :, args.single_prediction_time_step - 1]) # pred = scaler.inverse_transform(yhat)
+        print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}, Shape of realy sliced to relevant temporal horizon only: {realy[:,:,args.single_prediction_time_step - 1].shape}")
+        metrics = util.metric(pred, realy[:,:,args.single_prediction_time_step - 1]) # Consider only the relevant temporal horizon 
         log = 'Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
         print(log.format(args.single_prediction_time_step, metrics[0], metrics[1], metrics[2]))
         amae.append(metrics[0])
