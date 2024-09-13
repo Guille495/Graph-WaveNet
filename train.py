@@ -282,9 +282,10 @@ def main():
     
     if args.prediction_multi_or_single=='single':
 
-        print(f'Yhat: {yhat.shape}')
-        # pred = scaler.inverse_transform(yhat)
-        pred = scaler.inverse_transform(yhat[:,:,args.single_prediction_time_step - 1])
+        print()
+        print(f'Yhat: {yhat.shape} , Yrealy: {realy.shape}')
+        print()
+        pred = scaler.inverse_transform(yhat)
         print()
         print(f"Shape of pred: {pred.shape}, Shape of realy: {realy.shape}, Shape of realy sliced to relevant temporal horizon only: {realy[:,:,args.single_prediction_time_step - 1].shape}")
         print()
