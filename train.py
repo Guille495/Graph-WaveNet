@@ -282,6 +282,7 @@ def main():
     
     if args.prediction_multi_or_single=='single':
 
+        print(f'Yhat: {yhat.shape}')
         # pred = scaler.inverse_transform(yhat)
         pred = scaler.inverse_transform(yhat[:,:,args.single_prediction_time_step - 1])
         print()
